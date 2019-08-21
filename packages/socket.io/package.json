@@ -1,0 +1,27 @@
+{
+  "name": "@mgfx/socket.io",
+  "description": "Scheduler and Executor for mgFx that uses socket.io for communication",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.18",
+    "@types/socket.io": "2.1.2",
+    "@types/socket.io-client": "1.4.32",
+    "jest": "24.9.0",
+    "ts-jest": "24.0.2",
+    "typescript": "3.5.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "mgfx": "^1.0.0",
+    "socket.io": "2.2.0",
+    "socket.io-client": "2.2.0"
+  }
+}

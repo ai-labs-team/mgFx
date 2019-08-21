@@ -1,0 +1,16 @@
+{
+  "name": "@mgfx/tasks",
+  "description": "A selection of common Tasks to use with mgFx with no other dependencies",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "mgfx": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "3.5.3"
+  }
+}

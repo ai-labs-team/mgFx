@@ -1,0 +1,30 @@
+{
+  "name": "mgfx",
+  "description": "Managed Side-Effects for JavaScript",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/bluebird": "3.5.27",
+    "@types/bunyan": "1.8.6",
+    "@types/jest": "24.0.18",
+    "@types/uuid": "3.4.5",
+    "jest": "24.9.0",
+    "ts-jest": "24.0.2",
+    "typescript": "3.5.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "bluebird": "3.5.5",
+    "bunyan": "1.8.12",
+    "eventemitter2": "5.0.1",
+    "serialize-error": "4.1.0",
+    "uuid": "3.3.3"
+  }
+}

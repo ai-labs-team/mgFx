@@ -1,0 +1,30 @@
+{
+  "name": "mgfx-monorepo",
+  "private": true,
+  "devDependencies": {
+    "@commitlint/cli": "8.1.0",
+    "@commitlint/config-conventional": "8.1.0",
+    "@commitlint/config-lerna-scopes": "8.1.0",
+    "husky": "3.0.4",
+    "lerna": "^3.16.4",
+    "rimraf": "3.0.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional",
+      "@commitlint/config-lerna-scopes"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "scripts": {
+    "postinstall": "node node_modules/husky/lib/installer/bin install",
+    "clean": "rimraf packages/**/dist"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
