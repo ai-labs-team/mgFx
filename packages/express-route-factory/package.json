@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "mgfx": "^1.0.0"
+    "mgfx": "^0.0.0"
   },
   "devDependencies": {
     "@types/express": "4.17.0",

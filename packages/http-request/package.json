@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "0.19.0",
-    "mgfx": "^1.0.0"
+    "mgfx": "^0.0.0"
   },
   "devDependencies": {
     "typescript": "3.5.3"
