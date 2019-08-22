@@ -15,5 +15,8 @@
   "dependencies": {
     "sqlite3": "4.1.0",
     "yargs": "14.0.0"
+  },
+  "bin": {
+    "recorder": "./dist/index.js"
   }
 }
