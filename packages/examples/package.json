@@ -8,11 +8,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@mgfx/express-route-factory": "^0.0.0",
-    "@mgfx/tasks": "^0.0.0",
+    "@mgfx/express-route-factory": "0.*",
+    "@mgfx/tasks": "0.*",
     "body-parser": "1.19.0",
     "express": "4.17.1",
-    "mgfx": "^0.0.0"
+    "mgfx": "0.*"
   },
   "devDependencies": {
     "typescript": "3.5.3"
