@@ -1,7 +1,7 @@
 {
   "name": "@mgfx/socket.io",
   "description": "Scheduler and Executor for mgFx that uses socket.io for communication",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {

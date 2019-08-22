@@ -1,7 +1,7 @@
 {
   "name": "@mgfx/examples",
   "description": "A selection of example applications using mgFx",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
