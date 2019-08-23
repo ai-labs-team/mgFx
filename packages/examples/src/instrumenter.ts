@@ -15,8 +15,8 @@ class RandomNumbers extends Task<number[]> {
 
     for (let i = 0; i < count; i += 1) {
       results.push(
-        scheduler.exec(Timeout, 100)
-          .then(() => scheduler.exec(RandomNumber, min, max))
+        this.exec(Timeout, 100)
+          .then(() => this.exec(RandomNumber, min, max))
       );
     }
 
