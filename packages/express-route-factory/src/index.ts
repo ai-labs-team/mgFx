@@ -1,4 +1,4 @@
-import { Application, RequestHandler, IRouterMatcher, ParamsDictionary } from 'express-serve-static-core';
+import { Application, IRouterMatcher, Request, Response, NextFunction } from 'express';
 import { Context } from 'mgfx';
 
 export type MethodName =
@@ -11,10 +11,15 @@ export type MethodName =
   | 'options'
   | 'head';
 
-export type MethodHandlers = {
-  [P in MethodName]: RequestHandler
+export type ExtRequest<Config> = Request & { config: Config };
+
+export type RequestHandler<Config> = {
+  (req: ExtRequest<Config>, res: Response, next: NextFunction): any;
 }
 
+export type MethodHandlers<Config> = {
+  [P in MethodName]: RequestHandler<Config>
+}
 
 declare global {
   namespace Express {
@@ -32,7 +37,7 @@ export type Config = {
 export class ExpressRouteFactory {
   constructor(protected readonly _config: Config) { }
 
-  route(path: string, methodHandlers: Partial<MethodHandlers>) {
+  route<Config>(path: string, methodHandlers: Partial<MethodHandlers<Config>>) {
     const { context, app } = this._config;
 
     const pathCtx = context.createChild({
@@ -46,11 +51,12 @@ export class ExpressRouteFactory {
 
       (app[method as MethodName] as IRouterMatcher<any>)(
         path,
-        (req, _, next) => {
+        (req: any, { }: any, next: NextFunction) => {
           req.exec = methodCtx.exec.bind(methodCtx);
+          req.config = {};
           next();
         },
-        methodHandlers[method as MethodName]!
+        methodHandlers[method as MethodName]! as any
       );
     }
   }
