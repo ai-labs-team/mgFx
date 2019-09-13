@@ -1,14 +1,14 @@
 {
   "name": "@mgfx/examples",
   "description": "A selection of example applications using mgFx",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc"
   },
   "dependencies": {
-    "@mgfx/express-route-factory": "^0.1.2",
+    "@mgfx/express-route-factory": "^0.2.0",
     "@mgfx/tasks": "^0.1.2",
     "body-parser": "1.19.0",
     "express": "4.17.1",
