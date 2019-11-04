@@ -3,6 +3,7 @@ import Koa from 'koa';
 import logger from 'koa-logger';
 import serve from 'koa-static-server';
 import Router from '@koa/router';
+import { resolve } from 'path';
 
 import { Args } from '.';
 
@@ -64,7 +65,7 @@ export class Inspector {
       .use(logger())
       .use(this._router.routes())
       .use(serve({
-        rootDir: 'dist/ui',
+        rootDir: resolve(__dirname, 'ui'),
         notFoundFile: 'index.html'
       }));
 
