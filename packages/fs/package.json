@@ -1,6 +1,6 @@
 {
-  "name": "@mgfx/tasks",
-  "description": "A selection of common Tasks to use with mgFx with no other dependencies",
+  "name": "@mgfx/fs",
+  "description": "Filesystem tasks to use with mgFx, with no other dependencies",
   "version": "0.1.2",
   "main": "dist/index.js",
   "license": "MIT",

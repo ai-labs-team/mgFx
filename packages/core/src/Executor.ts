@@ -15,6 +15,7 @@ export type Message = {
 }
 
 export abstract class Executor extends EventEmitter2 {
+
   protected abstract readonly _id: string;
 
   protected _executionObservers: ExecutionObserverMap = new Map();
