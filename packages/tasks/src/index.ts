@@ -1,18 +1,6 @@
 import * as fs from 'fs';
 import { Task } from 'mgfx';
 
-export class Timeout extends Task {
-  protected _timeout!: number;
-
-  run(ms: number) {
-    this._timeout = setTimeout(this.resolve.bind(this), ms);
-  }
-
-  dispose() {
-    clearTimeout(this._timeout);
-  }
-}
-
 export type ReadFileOptions = string
   | { encoding: string }
   & Partial<{

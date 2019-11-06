@@ -13,6 +13,7 @@
     "typescript": "3.5.3"
   },
   "dependencies": {
+    "fluture": "11.0.3",
     "sqlite3": "4.1.0",
     "yargs": "14.0.0"
   },

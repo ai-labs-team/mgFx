@@ -1,14 +1,11 @@
-import Bluebird from 'bluebird';
 import { EventEmitter2 } from 'eventemitter2';
 import uuid from 'uuid/v4';
 import serializeError from 'serialize-error';
 import colors from 'chalk';
 
-import { TaskConstructor, TaskParameters, TaskValue } from './Task';
 import { ExecutionObserverMap } from './Scheduler';
 
 export type Config = {
-  tasks: TaskConstructor<any>[],
   concurrency: number
 }
 

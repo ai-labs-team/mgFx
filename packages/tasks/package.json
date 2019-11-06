@@ -8,6 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "fluture": "11.0.3",
     "mgfx": "0.*"
   },
   "devDependencies": {

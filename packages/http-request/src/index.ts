@@ -1,15 +1,13 @@
-import axios, { AxiosResponse, CancelTokenSource, Method, AxiosBasicCredentials } from 'axios';
-import { Task } from 'mgfx';
-import { Serializable, SerializableObject } from 'mgfx/dist/Task';
+import axios, { AxiosResponse, Method, AxiosBasicCredentials } from 'axios';
+import { Serializable, SerializableObject } from 'mgfx/dist/Serializable';
+import { Future, FutureInstance } from 'fluture';
 
-export type Config = {
-  url: string;
-} & Partial<{
+export type Config = { url: string; } & Partial<{
   method: Method;
   baseURL: string;
   headers: SerializableObject;
   params: SerializableObject;
-  data: Serializable;
+  body: Serializable;
   timeout: number;
   auth: AxiosBasicCredentials;
   maxContentLength: number;
@@ -23,29 +21,16 @@ export type Config = {
   }>)
 }>
 
-export type HttpResponse<T extends Serializable> =
-  Omit<AxiosResponse<T>, 'config' | 'request'>
+export type Response<T extends Serializable> = Omit<AxiosResponse<T>, 'config' | 'request'>
 
-export class HttpRequest<T extends Serializable = Serializable> extends Task<HttpResponse<T>> {
-  protected cancelToken!: CancelTokenSource;
+export default ({ body, ...config }: Config): FutureInstance<Response<unknown>, Response<unknown>> => (
+  new Future((reject, resolve) => {
+    const cancelToken = axios.CancelToken.source();
 
-  run(config: Config) {
-    this.cancelToken = axios.CancelToken.source();
+    axios({ data: body, cancelToken: cancelToken.token, ...config })
+      .then(({ data, status, statusText, headers }) => resolve({ data, status, statusText, headers }))
+      .catch(reject);
 
-    axios({
-      ...config,
-      cancelToken: this.cancelToken.token
-    })
-      .then(response => this.resolve({
-        data: response.data,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers
-      }))
-      .catch(this.reject)
-  }
-
-  dispose() {
-    this.cancelToken.cancel();
-  }
-}
+    return cancelToken.cancel.bind(cancelToken);
+  })
+);

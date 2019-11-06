@@ -1,12 +1,10 @@
-import Bluebird from 'bluebird';
+import Future, { FutureInstance, Cancel } from 'fluture';
 import { EventEmitter2 } from 'eventemitter2';
 import uuid from 'uuid';
 
 import { Context, Config as ContextConfig } from './Context';
 import { DispatchStrategy } from './DispatchStrategy';
-import { TaskConstructor, TaskParameters, TaskValue, Serializable, SerializableArray } from './Task';
-
-Bluebird.config({ cancellation: true });
+import { Serializable, SerializableArray } from './Serializable';
 
 export type Config = {
   dispatchStrategy: DispatchStrategy
@@ -57,11 +55,11 @@ export type ExecutionObserverMap = Map<string, [(value: any) => void, (reason: a
 
 type EnqueueOptions = {
   id: string;
-  promisify: boolean;
   dispatch: boolean;
 }
 
 export abstract class Scheduler extends EventEmitter2 {
+
   protected _executors: ExecutorStateMap = new Map();
 
   protected _executions: ExecutionHandleMap = new Map();
@@ -72,7 +70,7 @@ export abstract class Scheduler extends EventEmitter2 {
 
   protected _willDispatchOnNextTick = false;
 
-  protected _injected: Array<[TaskConstructor<any>, TaskValue<any>]> = [];
+  protected _injected: Array<any> = [];
 
   constructor(protected readonly _config: Config) {
     super({
@@ -81,74 +79,43 @@ export abstract class Scheduler extends EventEmitter2 {
   }
 
   /**
-   * Enlightened (or dubious) use of overloading to correctly define return type of `enqueue` depending on whether
-   * `options.promisify` is set.
-   */
-  // Options not explicitly set; `options.promisify` defaults to `false` so a Promise will not be returned.
-  public enqueue(spec: ExecutionHandle): void
-
-  // `options.promisify` explicitly set to `false`; no Promise will be returned
-  public enqueue(spec: ExecutionHandle, options: Partial<EnqueueOptions & { promisify: false }>): void
-
-  // `options.promisify` explicitly set to `true`; a Promise will be returned
-  public enqueue<T extends any>(
-    spec: ExecutionHandle,
-    options: Partial<EnqueueOptions & { promisify: true }>
-  ): Bluebird<T>
-
-  /**
    * Enqueue the execution of a Task according to the Execution Spec given by `spec`.
    *
    * A number of `options` are also available to customise the execution semantics:
-   * - `id` - An explicit unique identifier for this execution. Internally this is used to allow Tasks that execute their own 'child' Tasks to correctly track the execution of that child. Users should not explicitly set this unless they can guaratee that the ID generated will be unique.
-   * - `promisify` - Determines whether the execution of this Task should be observed and 'wrapped' in a Promise. This defaults to `false` as an optimisation measure.
-   * - `dispatch` - Determines whether the execution of this Task (and any other pending Tasks) should be dispatched. Defaults to `true`, but if explicitly set to `false`, execution will remain in the `pending` state until a dispatch occurs elsewhere.
+   * - `id` - An explicit unique identifier for this execution. Internally this is used to allow Tasks that
+   *    execute their own 'child' Tasks to correctly track the execution of that child. Users should not explicitly
+   *    set this unless they can guaratee that the ID generated will be unique.
+   * - `dispatch` - Determines whether the execution of this Task (and any other pending Tasks) should be dispatched.
+   *   Defaults to `true`, but if explicitly set to `false`, execution will remain in the `pending` state until a
+   *   dispatch occurs elsewhere.
    *   (this is probably a dumb option to expose since there's no use for it internally, multiple dispatch calls are already batched together and you don't really get much control over when or how somebody else triggers a dispatch)
    */
-  public enqueue(spec: ExecutionHandle, options: Partial<EnqueueOptions> = {}) {
-    const {
-      id = uuid(),
-      promisify = false,
-      dispatch = true
-    } = options;
+  public enqueue<Err extends any, Val extends any>(spec: ExecutionHandle, options: Partial<EnqueueOptions> = {}): FutureInstance<Err, Val> {
+    const { id = uuid(), dispatch = true } = options;
 
     this._executions.set(id, spec);
     this._executionStates.set(id, { phase: 'pending' });
 
     this.emit(['enqueued', id], id, spec);
 
-    const promise = promisify ? this._promisify(id) : undefined;
+    const future = new Future<Err, Val>((reject, resolve) => {
+      this._executionObservers.set(id, [resolve, reject]);
+      return (() => { this._cancel(id); });
+    }).finally(new Future((_, resolve) => {
+      this._executionObservers.delete(id);
+      resolve(null);
+    }));
+
 
     if (dispatch) {
       this._dispatchPending();
     }
 
-    return promise;
+    return future;
   }
 
-  /**
-   * Executes a Task with the given arguments and returns a Promise that represents the execution of that Task.
-   *
-   * This is a convenience wrapper around `enqueue` that:
-   *
-   * 1. Creates an Execution Spec based on `task` and `args`, dispatches.
-   * 2. Allows this Execution Spec (and any others that are pending) to be dispatched immediately.
-   * 3. Signals that this execution should be 'promisifed' so that the caller of `exec` may observe the result.
-   * 4. Provides semantic types for `args` and the value of the Promise that is returned based upon the Task's type
-   * information.
-   *
-   * In addition to using `exec` directly, users may also use the `exec` method on a Context instance that is bound to
-   * this Scheduler. Using Contexts allows for greater insight into 'where' a Task execution originated from.
-   */
-  public exec<T extends TaskConstructor<any>>(task: T, ...args: TaskParameters<T>) {
-    return this.enqueue<TaskValue<T>>({
-      taskName: task.name,
-      args
-    }, { promisify: true });
-  }
-
-  public inject<T extends TaskConstructor<any>>(task: T, value: TaskValue<T>) {
-    this._injected.push([task, value]);
+  public inject<T>(task: T) {
+    this._injected.push(task);
 
     return this;
   }
@@ -278,8 +245,8 @@ export abstract class Scheduler extends EventEmitter2 {
     if (this._willDispatchOnNextTick) {
       return;
     }
-
     this._willDispatchOnNextTick = true;
+
     setImmediate(() => {
       for (const [id, handle] of this._executionStates) {
         if (handle.phase !== 'pending') {
@@ -347,19 +314,6 @@ export abstract class Scheduler extends EventEmitter2 {
     }, '_self');
 
     return true;
-  }
-
-  protected _promisify(handleId: string) {
-    return new Bluebird((resolve, reject, onCancel) => {
-      this._executionObservers.set(handleId, [resolve, reject]);
-
-      onCancel!(() => {
-        this._cancel(handleId);
-      })
-    })
-      .finally(() => {
-        this._executionObservers.delete(handleId);
-      });
   }
 
   protected _registerExecutor(id: string, state: ExecutorState) {

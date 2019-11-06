@@ -1,8 +1,7 @@
-import Bluebird from 'bluebird';
 import uuid from 'uuid/v4';
 
 import { Scheduler } from './Scheduler';
-import { TaskConstructor, TaskParameters, TaskValue } from './Task';
+import { TaskConstructor, TaskParameters, TaskValue } from './Serializable';
 
 export type Labels = {
   [key: string]: string
@@ -42,6 +41,6 @@ export class Context {
       contextId: this.id,
       taskName: task.name,
       args
-    }, { promisify: true });
+    });
   }
 }
