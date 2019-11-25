@@ -4,7 +4,7 @@ import uuid from 'uuid';
 
 import { Context, Config as ContextConfig } from './Context';
 import { DispatchStrategy } from './DispatchStrategy';
-import { Serializable, SerializableArray } from './Serializable';
+import { Serializable, SerializableArray, SerializableObject } from './Serializable';
 
 export type Config = {
   dispatchStrategy: DispatchStrategy
@@ -35,8 +35,7 @@ export type ExecutorStateMap = Map<string, ExecutorState>;
 export type ExecutionHandle = {
   parentId?: string;
   contextId?: string;
-  taskName: string;
-  args: any[];
+  task: any;
 }
 
 type ExecutionHandleMap = Map<string, ExecutionHandle>;
@@ -197,15 +196,14 @@ export abstract class Scheduler extends EventEmitter2 {
     }
 
     if (message.event[0] === 'execChild') {
-      const [id, parentId, taskName, args] = message.args;
+      const [id, parentId, task] = message.args;
 
       const parent = this._executions.get(parentId);
 
       this.enqueue({
         contextId: parent ? parent.contextId : undefined,
         parentId,
-        taskName,
-        args
+        task
       }, { id });
     }
   }
@@ -267,13 +265,13 @@ export abstract class Scheduler extends EventEmitter2 {
    * and the Task will *not* be dispatched to an Executor.
    */
   protected _dispatch(handleId: string) {
-    const { taskName, args } = this._executions.get(handleId)!;
+    const { task } = this._executions.get(handleId)!;
 
-    if (this._tryReplay(handleId, taskName, args)) {
+    if (this._tryReplay(handleId, task)) {
       return;
     }
 
-    const executorId = this._config.dispatchStrategy.choose(taskName, this._executors);
+    const executorId = this._config.dispatchStrategy.choose(task, this._executors);
 
     if (!executorId) {
       return;
@@ -290,14 +288,13 @@ export abstract class Scheduler extends EventEmitter2 {
       event: 'execute',
       args: [
         handleId,
-        taskName,
-        args
+        task
       ]
     });
   }
 
-  protected _tryReplay(handleId: string, taskName: string, args: SerializableArray) {
-    const index = this._injected.findIndex(injected => injected[0].name === taskName);
+  protected _tryReplay(handleId: string, task: SerializableObject) {
+    const index = this._injected.findIndex(injected => injected[0].name === task.type);
 
     if (index < 0) {
       return false;

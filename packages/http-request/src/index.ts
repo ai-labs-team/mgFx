@@ -21,9 +21,10 @@ export type Config = { url: string; } & Partial<{
   }>)
 }>
 
-export type Response<T extends Serializable> = Omit<AxiosResponse<T>, 'config' | 'request'>
+export type Response<T extends Serializable> = Omit<AxiosResponse<T>, 'config' | 'request'>;
+export type HttpFuture<Err extends Serializable, Res extends Serializable> = FutureInstance<Response<Err>, Response<Res>>;
 
-export default ({ body, ...config }: Config): FutureInstance<Response<unknown>, Response<unknown>> => (
+export default <Err extends Serializable, Res extends Serializable>({ body, ...config }: Config): HttpFuture<Err, Res> => (
   new Future((reject, resolve) => {
     const cancelToken = axios.CancelToken.source();
 

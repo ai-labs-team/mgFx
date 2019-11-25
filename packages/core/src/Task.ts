@@ -5,15 +5,23 @@ export const scope = (prefix: string) => (constructor: Function) => {
 };
 
 type TaskSpec<Data> = {
-  id: string;
+  id: string | null;
   data: Data;
   options?: { [key: string]: any };
 };
 
-export abstract class Task<Data> {
+interface TaskConstructor<T extends Task<Data>, Data> {
+  new(spec: TaskSpec<Data> | Task<Data>): T;
+}
+
+export class Task<Data> {
 
   public static handler<Data>(_: Task<Data>): FutureInstance<unknown, unknown> {
     return Future.reject(new Error("Unhandled"));
+  }
+
+  public static fromJSON<T extends Task<Data>, Data>(spec: TaskSpec<Data> | Task<Data>) {
+    new (this as unknown as TaskConstructor<T, Data>)(spec);
   }
 
   public readonly id: string | null = null;
