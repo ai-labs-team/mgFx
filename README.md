@@ -1,64 +1,68 @@
 <div align="center">
 
-![mgfx](./docs/logo.png "mgfx")
+![mgfx](./docs/logo.png 'mgfx')
 
 # mgFx: Managed Effects for JavaScript
 
 </div>
 
 mgFx is a library for JavaScript applications that allows you to define asynchronous, side-effecting code ('Tasks') and
-then invoke those tasks (an 'Execution') in a predictable manner.
+then invoke those tasks in a predictable and type-safe manner.
 
 ## Quick-Start Guide
 
 1. Add mgFx to your existing NodeJS application:
 
-  ```bash
-  $ yarn add mgfx
-  ```
-  
-2. Define a Task:
+```bash
+$ yarn add mgfx
+```
 
-  ```typescript
-  import { Task } from 'mgfx';
+2. Define and Implement a Task:
 
-  class Wait extends Task {
-    run(ms: number) {
-      setTimeout(() => this.resolve(), ms);
-    }
-  }
-  ```
+```typescript
+import { define, implement } from 'mgfx';
 
-3. Create a Scheduler:
+const greet = implement(
+  define({ name: 'greet' }),
+  input => `Hello ${input.name}!`
+);
+```
 
-  ```typescript
-  import { singleProcess } from 'mgfx';
+3. Create a Connector:
 
-  const { scheduler } = singleProcess({
-    tasks: [
-      Wait
-    ]
-  });
-  ```
+```typescript
+import { localConnector } from 'mgfx';
 
-4. Use the Scheduler to execute your Task:
+const mgFx = localConnector();
+```
 
-  ```typescript
-  scheduler.exec(Wait, 1000)
-    .then(() => console.log('The wait is over!'));
-  ```
+4. Use the Scheduler to serve your Task implementation and run it:
+
+```typescript
+mgFx.serve(greet);
+
+mgFx
+  .run(greet({ name: 'World' }))
+  .pipe(promise)
+  .then(console.log);
+
+// Logs: `Hello World!`
+```
 
 ## Going Further
 
 The Quick-Start guide merely scratches the surface of what mgFx can provide. Other features that need to be highlighted
 and documented are:
 
-- Multi-threaded execution of Tasks by using Workers.
-- 'Categorising' Task executions by using Contexts.
-- Cancelling Task executions.
+- Run-time validation of Task input and output.
+- Composing Tasks that run other Tasks.
+- Run-time instrumentation and aggregated telemetry.
 - The [additional tools](./packages) in the mgFx ecosystem.
 
 ## Instrumentation
+
+**TODO**: This section is currently out of date; it will be rewritten when _telemetry aggregation_ has been
+\*implemented.
 
 A first-class priorty of mgFx is the ability to observe and analyse the behaviour of an application using mgFx at
 runtime. To achieve this, mgFx has three distinct 'layers' that are designed to work together:
@@ -85,7 +89,9 @@ To enable Instrumentation for your mgFx application, simply create an `Instrumen
 import { Inspector, singleProcess } from 'mgfx';
 
 const { scheduler } = singleProcess({
-  tasks: [ /* Your list of tasks... */ ]
+  tasks: [
+    /* Your list of tasks... */
+  ]
 });
 
 new Instrumenter({ scheduler });
@@ -105,8 +111,3 @@ $ npx @mgfx/inspector sqlite mgfx-instrumentation.db
 ```
 
 Please consult the [Inspector documentation](./packages/inspector/README.md) for further information.
-
-## Roadmap/Planned Features
-
-- Support an existing asynchronous primitive such as [Fluture](https://github.com/fluture-js/Fluture) for better
-  composition of Tasks.
