@@ -13,6 +13,10 @@
     "type": "git",
     "url": "git+https://github.com/ai-labs-team/mgFx.git"
   },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json"
+  },
   "bugs": {
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
