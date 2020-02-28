@@ -1,0 +1,35 @@
+{
+  "name": "@mgfx/validator-iots",
+  "version": "0.1.0",
+  "description": "Run-time validation for mgFx, powered by io-ts",
+  "author": "Warren Seymour <warren@fountainhead.tech>",
+  "homepage": "https://github.com/ai-labs-team/mgFx#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-labs-team/mgFx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-labs-team/mgFx/issues"
+  },
+  "dependencies": {
+    "fp-ts": "^2.5.0",
+    "io-ts": "^2.1.1"
+  },
+  "devDependencies": {
+    "mgfx": "0.1.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
+}
