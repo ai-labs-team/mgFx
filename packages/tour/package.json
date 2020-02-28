@@ -1,0 +1,28 @@
+{
+  "name": "@mgfx/tour",
+  "version": "0.1.0",
+  "description": "A guided tour of mgFx fundamentals",
+  "author": "Warren Seymour <warren@fountainhead.tech>",
+  "homepage": "https://github.com/ai-labs-team/mgFx#readme",
+  "license": "ISC",
+  "main": "lib/tour.js",
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-labs-team/mgFx.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-labs-team/mgFx/issues"
+  },
+  "dependencies": {
+    "mgfx": "0.1.0"
+  },
+  "devDependencies": {
+    "docco": "^0.8.0"
+  }
+}
