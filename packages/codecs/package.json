@@ -1,0 +1,32 @@
+{
+  "name": "@mgfx/codecs",
+  "version": "0.1.0",
+  "description": "Common (de)serializing functions for mgFx",
+  "author": "Warren Seymour <warren@fountainhead.tech>",
+  "homepage": "https://github.com/ai-labs-team/mgFx#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-labs-team/mgFx.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-labs-team/mgFx/issues"
+  },
+  "dependencies": {
+    "fluture": "12.2.0",
+    "serialize-error": "5.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
+}
