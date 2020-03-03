@@ -1,0 +1,234 @@
+{
+  "groups": [
+    {
+      "id": 1,
+      "name": "Users managed by Robert"
+    },
+    {
+      "id": 2,
+      "name": "Users managed by Sally"
+    },
+    {
+      "id": "3",
+      "name": "Users managed by Robert, including one with invalid data"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Robert Loblaw"
+    },
+    {
+      "id": 2,
+      "name": "Sally McNally"
+    },
+    {
+      "id": 3,
+      "name": "Mario Speedwagon"
+    },
+    {
+      "id": 4,
+      "name": "Petey Cruiser"
+    },
+    {
+      "id": 5,
+      "name": "Anna Sthesia"
+    },
+    {
+      "id": 6,
+      "name": "Paul Molive"
+    },
+    {
+      "id": 7,
+      "name": "Anna Mull"
+    },
+    {
+      "id": 8,
+      "name": "Gail Forcewind"
+    },
+    {
+      "id": 9,
+      "name": "Paige Turner"
+    },
+    {
+      "id": 10,
+      "name": "Bob Frapples"
+    },
+    {
+      "id": 11,
+      "name": "Walter Melon"
+    },
+    {
+      "id": 12,
+      "name": "Nick R. Bocker"
+    },
+    {
+      "id": 13,
+      "name": "Tara Misu"
+    },
+    {
+      "id": 14,
+      "name": "Kerry Oaky"
+    }
+  ],
+  "group_memberships": [
+    {
+      "group_id": 1,
+      "user_id": 1,
+      "role": "manager"
+    },
+    {
+      "group_id": 2,
+      "user_id": 2,
+      "role": "manager"
+    },
+    {
+      "group_id": 1,
+      "user_id": 3,
+      "role": "user"
+    },
+    {
+      "group_id": 1,
+      "user_id": 4,
+      "role": "user"
+    },
+    {
+      "group_id": 1,
+      "user_id": 5,
+      "role": "user"
+    },
+    {
+      "group_id": 1,
+      "user_id": 6,
+      "role": "user"
+    },
+    {
+      "group_id": 1,
+      "user_id": 7,
+      "role": "user"
+    },
+    {
+      "group_id": 2,
+      "user_id": 8,
+      "role": "user"
+    },
+    {
+      "group_id": 2,
+      "user_id": 9,
+      "role": "user"
+    },
+    {
+      "group_id": 2,
+      "user_id": 10,
+      "role": "user"
+    },
+    {
+      "group_id": 2,
+      "user_id": 11,
+      "role": "user"
+    },
+    {
+      "group_id": 2,
+      "user_id": 12,
+      "role": "user"
+    },
+    {
+      "group_id": 3,
+      "user_id": 1,
+      "role": "manager"
+    },
+    {
+      "group_id": 3,
+      "user_id": 13,
+      "role": "user"
+    },
+    {
+      "group_id": 3,
+      "user_id": 14,
+      "role": "user"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "institution": "bankZ",
+      "institution_reference": "1001",
+      "user_id": 3,
+      "label": "Checking Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 2,
+      "institution": "bankB",
+      "institution_reference": "S-1002",
+      "user_id": 3,
+      "label": "Savings Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 3,
+      "institution": "bankA",
+      "institution_reference": "1003",
+      "user_id": 4,
+      "label": "Checking Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 4,
+      "institution": "bankB",
+      "institution_reference": "I-1004",
+      "user_id": 4,
+      "label": "Investment Portfolio",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 5,
+      "institution": "bankA",
+      "institution_reference": "1005",
+      "user_id": 5,
+      "label": "Checking Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 6,
+      "institution": "bankA",
+      "institution_reference": "1006",
+      "user_id": 6,
+      "label": "Checking Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 7,
+      "institution": "bankA",
+      "institution_reference": "1007",
+      "user_id": 7,
+      "label": "Checking Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 8,
+      "institution": "bankB",
+      "institution_reference": "S-1008",
+      "user_id": 7,
+      "label": "Savings Account",
+      "balance": null,
+      "last_refreshed": null
+    },
+    {
+      "id": 9,
+      "institution": "bankB",
+      "institution_reference": "I-1009",
+      "user_id": 7,
+      "label": "Investment Portfolio",
+      "balance": null,
+      "last_refreshed": null
+    }
+  ]
+}
