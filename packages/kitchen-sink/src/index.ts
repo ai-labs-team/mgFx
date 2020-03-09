@@ -11,7 +11,9 @@ const server = jsonServer.create();
 const middleware = jsonServer.defaults();
 
 const fixturedApp = (name: string) =>
-  jsonServer.router(join(__dirname, 'fixtures', `${name}.json`));
+  jsonServer.router(join(__dirname, 'fixtures', `${name}.json`), {
+    foreignKeySuffix: '_id'
+  });
 
 const chaos = _chaos({
   probability: 0.5,
@@ -27,7 +29,7 @@ server
   .use(middleware)
   // The 'Core' service is one which we consider to be in control of; it has low latency and jitter, and response data
   // usually conforms to structures we expect.
-  .use('/core', fixturedApp('core').use(pause(200)))
+  .use('/core', pause(200), fixturedApp('core'))
   // The 'Bridge' service is also one is our control; it is an Express app that is responsible for moving data back and
   // forth between our Core service and external services.
   .use('/bridge', bridge)

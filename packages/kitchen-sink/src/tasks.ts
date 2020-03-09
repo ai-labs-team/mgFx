@@ -251,7 +251,7 @@ export const updateBalance = implement(
       method: 'patch',
       data: {
         balance,
-        lastRefreshed: Date.now()
+        last_refreshed: Date.now()
       }
     })
       .pipe(runChild)
