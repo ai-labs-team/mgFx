@@ -1,0 +1,37 @@
+{
+  "name": "@mgfx/task-http-request",
+  "version": "0.0.0",
+  "description": "A generic mgFx task definition to perform HTTP requests using Axios",
+  "author": "Warren Seymour <warren@fountainhead.tech>",
+  "homepage": "https://github.com/ai-labs-team/mgFx#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-labs-team/mgFx.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-labs-team/mgFx/issues"
+  },
+  "dependencies": {
+    "@mgfx/validator-iots": "^0.1.2",
+    "axios": "^0.19.2",
+    "bull": "^3.13.0",
+    "mgfx": "^0.2.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
