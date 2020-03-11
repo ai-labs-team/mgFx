@@ -1,6 +1,5 @@
 import { FutureInstance, encase, map } from 'fluture';
 import { serializeError, deserializeError } from 'serialize-error';
-import { Process } from 'mgfx/dist/task';
 
 /**
  * An Encoder function accepts an arbitrary value and returns a Future that will resolve to the stringified
