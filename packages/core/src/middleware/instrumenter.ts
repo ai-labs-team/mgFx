@@ -11,12 +11,37 @@ import { tapCancellation } from '../utils';
 /**
  * The type of Event messages that the base Instrumenter will emit
  */
-export type Event = { timestamp: number } & (
-  | { kind: 'process'; process: Process }
-  | { kind: 'resolution'; id: string; value: any }
-  | { kind: 'rejection'; id: string; reason: any }
-  | { kind: 'cancellation'; id: string }
-);
+export type BaseEvent = {
+  timestamp: number;
+};
+
+export type ProcessEvent = BaseEvent & {
+  kind: 'process';
+  process: Process;
+};
+
+export type ResolutionEvent = BaseEvent & {
+  kind: 'resolution';
+  id: string;
+  value: any;
+};
+
+export type RejectionEvent = BaseEvent & {
+  kind: 'rejection';
+  id: string;
+  reason: any;
+};
+
+export type CancellationEvent = BaseEvent & {
+  kind: 'cancellation';
+  id: string;
+};
+
+export type Event =
+  | ProcessEvent
+  | ResolutionEvent
+  | RejectionEvent
+  | CancellationEvent;
 
 /**
  * The configuration options that should be passed to `makeInstrumenter` when making a specialized Instrumenter.
