@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-bull@0.1.3...@mgfx/task-bull@0.1.4) (2020-03-16)
+
+**Note:** Version bump only for package @mgfx/task-bull
+
+
+
+
+
 ## [0.1.3](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-bull@0.1.2...@mgfx/task-bull@0.1.3) (2020-03-16)
 
 **Note:** Version bump only for package @mgfx/task-bull
