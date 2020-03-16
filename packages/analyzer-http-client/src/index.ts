@@ -1,3 +1,4 @@
+import { Event, makeInstrumenter } from 'mgfx/dist/middleware/instrumenter';
 import { Analyzer } from '@mgfx/analyzer';
 import { value } from '@mgfx/codecs';
 import { map, reject, chain, encaseP, fork } from 'fluture';
@@ -7,49 +8,62 @@ export type Config = {
   baseUrl: string;
 };
 
-export const httpClient = (config: Config): Analyzer => ({
-  collector: {
-    pre: () => reject(new Error('Not implemented yet.')),
-    post: () => reject(new Error('Not implemented yet.'))
-  },
+export const httpClient = (config: Config): Analyzer => {
+  const receiver = (event: Event) => {
+    const url = `${config.baseUrl}/collector`;
 
-  query: {
-    spans: params => {
-      const url = `${config.baseUrl}/query/spans`;
-      const paramsF = value.encode(params).pipe(map(encodeURIComponent));
+    fetch(url, {
+      method: 'post',
+      body: JSON.stringify(event),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  };
 
-      return {
-        get: () =>
-          paramsF
-            .pipe(chain(encaseP(params => fetch(`${url}?q=${params}`))))
-            .pipe(chain(encaseP(response => response.json()))),
+  return {
+    receiver,
 
-        watch: () =>
-          stream(emitter => {
-            let eventSource: EventSource;
+    collector: makeInstrumenter({ receiver }),
 
-            const cancel = paramsF.pipe(
-              fork(console.error)(params => {
-                eventSource = new EventSource(`${url}/observe?q=${params}`);
-                eventSource.addEventListener('message', message => {
-                  emitter.emit(JSON.parse(message.data));
-                });
+    query: {
+      spans: params => {
+        const url = `${config.baseUrl}/query/spans`;
+        const paramsF = value.encode(params).pipe(map(encodeURIComponent));
 
-                eventSource.addEventListener('error', error => {
-                  emitter.error(error);
-                });
-              })
-            );
+        return {
+          get: () =>
+            paramsF
+              .pipe(chain(encaseP(params => fetch(`${url}?q=${params}`))))
+              .pipe(chain(encaseP(response => response.json()))),
 
-            return () => {
-              cancel();
+          watch: () =>
+            stream(emitter => {
+              let eventSource: EventSource;
 
-              if (eventSource) {
-                eventSource.close();
-              }
-            };
-          })
-      };
+              const cancel = paramsF.pipe(
+                fork(console.error)(params => {
+                  eventSource = new EventSource(`${url}/observe?q=${params}`);
+                  eventSource.addEventListener('message', message => {
+                    emitter.emit(JSON.parse(message.data));
+                  });
+
+                  eventSource.addEventListener('error', error => {
+                    emitter.error(error);
+                  });
+                })
+              );
+
+              return () => {
+                cancel();
+
+                if (eventSource) {
+                  eventSource.close();
+                }
+              };
+            })
+        };
+      }
     }
-  }
-});
+  };
+};

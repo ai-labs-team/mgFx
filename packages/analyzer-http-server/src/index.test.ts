@@ -3,12 +3,16 @@ import { reject, after, chain, promise, map } from 'fluture';
 import { localConnector, implement, define, fork } from 'mgfx';
 import request from 'supertest';
 import { PassThrough } from 'stream';
+import { unlink as _unlink } from 'fs';
+import { promisify } from 'util';
 
 import { ioTs, t } from '@mgfx/validator-iots';
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { sqlite } from '@mgfx/analyzer-storage-sqlite';
 
 import { httpServer } from './index';
+
+const unlink = promisify(_unlink);
 
 const analyzer = makeAnalyzer({
   storage: sqlite({})
@@ -36,6 +40,79 @@ app.use(
     analyzer
   })
 );
+
+afterAll(async () => {
+  await unlink('mgfx-analyzer.sqlite');
+});
+
+describe('/collector', () => {
+  it('performs collects events received via HTTP', async () => {
+    await request(app)
+      .post('/analyzer/collector')
+      .set('Accept', 'application/json')
+      .send({
+        timestamp: 1,
+        kind: 'process',
+        process: {
+          spec: {
+            name: 'test'
+          },
+          id: 'test-1',
+          input: 'hello'
+        }
+      });
+
+    const runningResponse = await request(app)
+      .get('/analyzer/query/spans')
+      .query({ q: JSON.stringify({ v: { scope: { id: 'test-1' } } }) })
+      .set('Accept', 'application/json');
+
+    expect(runningResponse.body).toEqual([
+      {
+        id: 'test-1',
+        createdAt: 1,
+        process: {
+          spec: {
+            name: 'test'
+          }
+        },
+        input: 'hello',
+        state: 'running'
+      }
+    ]);
+
+    await request(app)
+      .post('/analyzer/collector')
+      .set('Accept', 'application/json')
+      .send({
+        timestamp: 2,
+        kind: 'resolution',
+        id: 'test-1',
+        value: 'world'
+      });
+
+    const resolvedResponse = await request(app)
+      .get('/analyzer/query/spans')
+      .query({ q: JSON.stringify({ v: { scope: { id: 'test-1' } } }) })
+      .set('Accept', 'application/json');
+
+    expect(resolvedResponse.body).toEqual([
+      {
+        id: 'test-1',
+        createdAt: 1,
+        resolvedAt: 2,
+        process: {
+          spec: {
+            name: 'test'
+          }
+        },
+        input: 'hello',
+        state: 'resolved',
+        value: 'world'
+      }
+    ]);
+  });
+});
 
 describe('/query/spans', () => {
   it('responds with an empty list of spans', async () => {

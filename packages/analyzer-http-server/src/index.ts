@@ -1,10 +1,11 @@
 import compression from 'compression';
 import { Router, Response, Request, NextFunction } from 'express';
+import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import { Analyzer } from '@mgfx/analyzer';
 import { ioTs, t } from '@mgfx/validator-iots';
 import { value } from '@mgfx/codecs';
-import { chain, fork, FutureInstance } from 'fluture';
+import { chain, fork, map, FutureInstance } from 'fluture';
 import { validateInput, Validator } from 'mgfx/dist/validator';
 
 const queryParams = {
@@ -43,6 +44,70 @@ const queryParams = {
   )
 };
 
+const baseEvent = t.type({ timestamp: t.number });
+const processEvent = t.intersection([
+  baseEvent,
+  t.type({
+    kind: t.literal('process'),
+    process: t.type({
+      spec: t.type({
+        name: t.string
+      }),
+      id: t.string,
+      parentId: t.union([t.undefined, t.string]),
+      input: t.any,
+      context: t.union([
+        t.undefined,
+        t.type({
+          id: t.string,
+          parentId: t.union([t.undefined, t.string]),
+          values: t.record(
+            t.string,
+            t.union([
+              t.string,
+              t.number,
+              t.boolean,
+              t.array(t.string),
+              t.array(t.number),
+              t.array(t.boolean)
+            ])
+          )
+        })
+      ])
+    })
+  })
+]);
+
+const resolutionEvent = t.intersection([
+  baseEvent,
+  t.type({
+    kind: t.literal('resolution'),
+    id: t.string,
+    value: t.any
+  })
+]);
+
+const rejectionEvent = t.intersection([
+  baseEvent,
+  t.type({
+    kind: t.literal('rejection'),
+    id: t.string,
+    reason: t.any
+  })
+]);
+
+const cancellationEvent = t.intersection([
+  baseEvent,
+  t.type({
+    kind: t.literal('cancellation'),
+    id: t.string
+  })
+]);
+
+const event = ioTs(
+  t.union([processEvent, resolutionEvent, rejectionEvent, cancellationEvent])
+);
+
 const decodeQuery = <T>(
   req: Request,
   validator: Validator<T>
@@ -50,6 +115,11 @@ const decodeQuery = <T>(
   value
     .decode(req.query.q)
     .pipe(chain(value => validateInput(validator, value)));
+
+const decodeBody = <T>(
+  req: Request,
+  validator: Validator<T>
+): FutureInstance<any, T> => validateInput(validator, req.body);
 
 const toResponse = (res: Response, next: NextFunction) =>
   fork(next)(v => res.json(v));
@@ -64,6 +134,12 @@ export const httpServer = (config: Config) => {
 
   return router
     .use(compression())
+    .use(bodyParser.json())
+    .post('/collector', (req, res, next) => {
+      decodeBody(req, event)
+        .pipe(map(event => analyzer.receiver(event)))
+        .pipe(toResponse(res, next));
+    })
     .get('/query/spans', (req, res, next) => {
       decodeQuery(req, queryParams.spans)
         .pipe(chain(params => analyzer.query.spans(params).get()))

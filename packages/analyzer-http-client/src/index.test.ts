@@ -21,9 +21,9 @@ Object.assign(global, { fetch, EventSource });
 const app = express();
 const connector = localConnector();
 const analyzer = makeAnalyzer({ storage: sqlite({}) });
-const client = httpClient({ baseUrl: 'http://localhost:8080' });
+const client = httpClient({ baseUrl: 'http://localhost:8081' });
 
-connector.use(analyzer.collector);
+connector.use(client.collector);
 app.use(httpServer({ analyzer }));
 
 const add = implement(
@@ -39,7 +39,7 @@ connector.serve(add);
 
 const start = () =>
   new Promise<Server>((resolve, reject) => {
-    const server = app.listen(8080, err => {
+    const server = app.listen(8081, err => {
       err ? reject(err) : resolve(server);
     });
   });

@@ -4,7 +4,7 @@
  */
 import { map, bimap } from 'fluture';
 
-import { Process } from '../task';
+import { Process, Spec } from '../task';
 import { Bundle } from '../middleware';
 import { tapCancellation } from '../utils';
 
@@ -17,7 +17,9 @@ export type BaseEvent = {
 
 export type ProcessEvent = BaseEvent & {
   kind: 'process';
-  process: Process;
+  process: Omit<Process, 'spec'> & {
+    spec: Pick<Spec, 'name'>;
+  };
 };
 
 export type ResolutionEvent = BaseEvent & {
