@@ -1,0 +1,42 @@
+{
+  "name": "@mgfx/analyzer-http-server",
+  "version": "0.1.0",
+  "description": "HTTP-based Server for @mgfx/analyzer",
+  "author": "Warren Seymour <warren@fountainhead.tech>",
+  "homepage": "https://github.com/ai-labs-team/mgFx#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-labs-team/mgFx.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-labs-team/mgFx/issues"
+  },
+  "dependencies": {
+    "@mgfx/codecs": "0.1.0",
+    "@warrenseymour/json-delta": "^1.0.2",
+    "compression": "^1.7.4",
+    "express": "^4.17.1",
+    "io-ts": "^2.1.2"
+  },
+  "devDependencies": {
+    "@mgfx/analyzer": "0.1.0",
+    "@mgfx/analyzer-storage-sqlite": "0.1.0",
+    "@types/compression": "^1.7.0",
+    "@types/supertest": "^2.0.8",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
+}

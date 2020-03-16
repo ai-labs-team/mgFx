@@ -4,3 +4,4 @@ node_modules
 **/*/coverage
 **/*/yarn-error.log
 **/*/tsconfig.tsbuildinfo
+**/*/mgfx-analyzer.sqlite
