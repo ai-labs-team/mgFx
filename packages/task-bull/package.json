@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/task-bull",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A generic mgFx task definition that allows you to run Bull Jobs",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,9 +22,9 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "@mgfx/validator-iots": "^0.1.4",
+    "@mgfx/validator-iots": "^0.1.5",
     "bull": "^3.13.0",
-    "mgfx": "^0.2.2"
+    "mgfx": "^0.3.0"
   },
   "devDependencies": {
     "@types/bull": "^3.12.0"

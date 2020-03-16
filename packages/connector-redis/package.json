@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/connector-redis",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "An mgFx connector that uses Redis as a transport provider",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -26,11 +26,11 @@
     "fluture": "^12.2.0",
     "generic-pool": "^3.7.1",
     "ioredis": "^4.14.1",
-    "mgfx": "^0.2.2",
+    "mgfx": "^0.3.0",
     "serialize-error": "^5.0.0"
   },
   "devDependencies": {
-    "@mgfx/validator-iots": "^0.1.4",
+    "@mgfx/validator-iots": "^0.1.5",
     "@types/generic-pool": "^3.1.9",
     "@types/ioredis": "^4.14.7",
     "@types/jest": "^25.1.2",
