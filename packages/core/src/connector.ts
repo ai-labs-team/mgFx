@@ -167,7 +167,7 @@ export const makeConnector = (config: Config): Connector => {
     serve: implementation =>
       config.provide(
         implementation.spec,
-        encaseImplementation(implementation.implementation),
+        encaseImplementation(implementation.implementation) as any,
         environmentInitializer
       ),
 
