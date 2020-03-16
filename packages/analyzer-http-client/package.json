@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@types/kefir": "^3.8.2",
+    "@mgfx/codecs": "0.2.1",
     "kefir": "^3.8.6",
     "qs": "^6.9.1"
   }
