@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.1](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.3.0...@mgfx/analyzer-http-server@0.3.1) (2020-03-17)
+
+
+### Bug Fixes
+
+* analyzer-http-server: add missing `errorhandler` dependency ([7605b96](https://github.com/ai-labs-team/mgFx/commit/7605b96))
+
+
+
+
+
 # [0.3.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.2.1...@mgfx/analyzer-http-server@0.3.0) (2020-03-16)
 
 
