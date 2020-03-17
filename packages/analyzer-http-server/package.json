@@ -25,6 +25,7 @@
     "@mgfx/codecs": "0.2.1",
     "@warrenseymour/json-delta": "^1.0.2",
     "compression": "^1.7.4",
+    "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "io-ts": "^2.1.2"
   },
