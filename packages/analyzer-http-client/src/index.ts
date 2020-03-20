@@ -1,16 +1,20 @@
 import { Event, makeInstrumenter } from 'mgfx/dist/middleware/instrumenter';
 import { Analyzer } from '@mgfx/analyzer';
 import { value } from '@mgfx/codecs';
-import { map, reject, chain, encaseP, fork } from 'fluture';
+import { map, chain, encaseP, fork } from 'fluture';
 import { stream } from 'kefir';
 
 export type Config = {
   baseUrl: string;
+  fetch: typeof fetch;
+  EventSource: typeof EventSource;
 };
 
 export const httpClient = (config: Config): Analyzer => {
+  const { baseUrl, fetch, EventSource } = config;
+
   const receiver = (event: Event) => {
-    const url = `${config.baseUrl}/collector`;
+    const url = `${baseUrl}/collector`;
 
     fetch(url, {
       method: 'post',
@@ -28,7 +32,7 @@ export const httpClient = (config: Config): Analyzer => {
 
     query: {
       spans: params => {
-        const url = `${config.baseUrl}/query/spans`;
+        const url = `${baseUrl}/query/spans`;
         const paramsF = value.encode(params).pipe(map(encodeURIComponent));
 
         return {

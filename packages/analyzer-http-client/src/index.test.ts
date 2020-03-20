@@ -5,10 +5,10 @@ import { ioTs, t } from '@mgfx/validator-iots';
 import express from 'express';
 import { after, promise } from 'fluture';
 import fetch from 'node-fetch';
+import EventSource from 'eventsource';
 import { Server } from 'http';
 import { unlink as _unlink } from 'fs';
 import { promisify } from 'util';
-import EventSource from 'eventsource';
 
 import { define, implement, localConnector } from 'mgfx';
 
@@ -16,12 +16,14 @@ import { httpClient } from './';
 
 const unlink = promisify(_unlink);
 
-Object.assign(global, { fetch, EventSource });
-
 const app = express();
 const connector = localConnector();
 const analyzer = makeAnalyzer({ storage: sqlite({}) });
-const client = httpClient({ baseUrl: 'http://localhost:8081' });
+const client = httpClient({
+  baseUrl: 'http://localhost:8081',
+  fetch: fetch as any,
+  EventSource: EventSource as any
+});
 
 connector.use(client.collector);
 app.use(httpServer({ analyzer }));
