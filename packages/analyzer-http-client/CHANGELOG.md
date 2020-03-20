@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-client@0.2.0...@mgfx/analyzer-http-client@0.3.0) (2020-03-20)
+
+
+### Features
+
+* analyzer-http-client: Require `fetch` and `EventSource` in config ([878ca90](https://github.com/ai-labs-team/mgFx/commit/878ca90))
+
+
+
+
+
 # [0.2.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-client@0.1.1...@mgfx/analyzer-http-client@0.2.0) (2020-03-16)
 
 
