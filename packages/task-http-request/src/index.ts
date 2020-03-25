@@ -20,7 +20,8 @@ export const httpRequest = implement(
         }),
         t.partial({
           data: t.any,
-          headers: t.record(t.string, t.string)
+          headers: t.record(t.string, t.string),
+          full: t.boolean
         })
       ])
     ),
@@ -29,7 +30,7 @@ export const httpRequest = implement(
       correlationId: ioTs(t.union([t.string, t.undefined]))
     }
   }),
-  ({ url, method, data, headers }, { context: { correlationId = '' } }) =>
+  ({ url, method, data, headers, full }, { context: { correlationId = '' } }) =>
     Future((reject, resolve) => {
       const source = axios.CancelToken.source();
 
@@ -42,7 +43,17 @@ export const httpRequest = implement(
           'Correlation-Id': correlationId
         }
       })
-        .then((response: any) => resolve(response.data))
+        .then((response: any) =>
+          resolve(
+            full === true
+              ? {
+                  data: response.data,
+                  status: response.status,
+                  headers: response.headers
+                }
+              : response.data
+          )
+        )
         .catch((error: AxiosError) => {
           reject(new Error(error.message));
         });
