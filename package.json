@@ -24,7 +24,13 @@
     "postinstall": "node node_modules/husky/lib/installer/bin install",
     "clean": "rimraf packages/**/dist"
   },
-  "workspaces": [
-    "packages/*"
-  ]
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/electron",
+      "**/electron-squirrel-startup"
+    ]
+  }
 }

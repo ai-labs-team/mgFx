@@ -1,0 +1,56 @@
+@import '~@blueprintjs/core/src/common/variables';
+
+.log {
+  .spans {
+    height: 100%;
+
+    .toolbar {
+      padding: 0 $pt-grid-size;
+      background-color: $light-gray5;
+      box-shadow: $pt-elevation-shadow-1;
+      height: $pt-grid-size * 3;
+      display: flex;
+
+      .bp3-dark & {
+        background-color: $dark-gray5;
+        box-shadow: $pt-dark-elevation-shadow-1;
+      }
+
+      .options {
+        align-self: center;
+        margin-left: auto;
+      }
+    }
+
+    .list {
+      max-height: 100%;
+      width: 100%;
+      overflow-y: auto;
+
+      .item {
+        margin: 1px;
+        cursor: pointer;
+        transition: opacity 0.1s ease;
+      }
+
+      .children {
+        margin-left: $pt-grid-size * 2;
+      }
+
+      &:hover,
+      &.has-selection {
+        .item {
+          opacity: 0.6;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.selected {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}

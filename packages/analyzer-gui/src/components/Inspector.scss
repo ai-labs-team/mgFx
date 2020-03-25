@@ -1,0 +1,64 @@
+@import '~@blueprintjs/core/src/common/variables';
+@import '~@blueprintjs/core/src/components/navbar/navbar';
+
+.inspector {
+  height: 100%;
+
+  .options {
+    align-self: center;
+  }
+
+  .bp3-tabs {
+    padding: 0 $pt-grid-size;
+    background-color: $light-gray5;
+    box-shadow: $pt-elevation-shadow-1;
+
+    .bp3-dark & {
+      background-color: $dark-gray5;
+      box-shadow: $pt-dark-elevation-shadow-1;
+    }
+
+    .bp3-tab-indicator-wrapper div {
+      margin-bottom: -1px;
+
+      .bp3-dark & {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .SplitPane {
+    top: $pt-button-height + 1px !important;
+
+    .Pane {
+      padding: $pt-grid-size;
+      overflow-y: auto;
+    }
+  }
+
+  .summary-tab {
+    display: grid;
+    margin: $pt-grid-size / 2 $pt-grid-size;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: $pt-grid-size;
+
+    dt,
+    dd {
+      line-height: $pt-line-height * 2;
+    }
+
+    .bp3-tag {
+      vertical-align: middle;
+    }
+
+    dd {
+      margin-left: 0;
+    }
+  }
+
+  li[role='treeitem'] {
+    .bp3-dark & {
+      background-color: $pt-dark-app-background-color !important;
+    }
+  }
+}
