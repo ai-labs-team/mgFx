@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/task-http-request",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A generic mgFx task definition to perform HTTP requests using Axios",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
