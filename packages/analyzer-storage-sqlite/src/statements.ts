@@ -9,6 +9,20 @@ import {
 import { Database, Statement } from 'sqlite';
 
 /**
+ * Inserts a value into the value cache if it doesn't already exist
+ */
+const cacheValue = `
+INSERT OR IGNORE INTO value_cache VALUES ($value);
+`;
+
+/**
+ * Determines the Row ID of a pre-existing value in the value cache
+ */
+const cacheId = `
+SELECT rowid FROM value_cache WHERE content = $value;
+`;
+
+/**
  * Inserts a row into the `events_process` table; used to store Events where `event.kind === 'process'`
  */
 const putEventProcess = `
@@ -17,19 +31,19 @@ INSERT INTO events_process (
   process_spec_name,
   process_id,
   process_parent_id,
-  input,
+  input_id,
   context_id,
   context_parent_id,
-  context_values
+  context_values_id
 ) VALUES (
   $timestamp,
   $processSpecName,
   $processId,
   $processParentId,
-  $input,
+  $inputId,
   $contextId,
   $contextParentId,
-  $contextValues
+  $contextValuesId
 )
 `;
 
@@ -40,11 +54,11 @@ const putEventResolution = `
 INSERT INTO events_resolution (
   timestamp,
   id,
-  value
+  value_id
 ) VALUES (
   $timestamp,
   $id,
-  $value
+  $valueId
 )
 `;
 
@@ -55,11 +69,11 @@ const putEventRejection = `
 INSERT INTO events_rejection (
   timestamp,
   id,
-  reason
+  reason_id
 ) VALUES (
   $timestamp,
   $id,
-  $reason
+  $reasonId
 )
 `;
 
@@ -86,13 +100,15 @@ REPLACE INTO spans
   WHERE id = $id
 `;
 
-const all = parallel(Infinity);
+const seq = parallel(1);
 
 const prepareStatement = (db: Database, statement: string) =>
   attemptP(() => db.prepare(statement));
 
 const prepareStatements = (db: Database) =>
   parallel(Infinity)([
+    prepareStatement(db, cacheValue),
+    prepareStatement(db, cacheId),
     prepareStatement(db, putEventProcess),
     prepareStatement(db, putEventResolution),
     prepareStatement(db, putEventRejection),
@@ -101,12 +117,16 @@ const prepareStatements = (db: Database) =>
   ]).pipe(
     map(
       ([
+        cacheValue,
+        cacheId,
         putEventProcess,
         putEventResolution,
         putEventRejection,
         putEventCancellation,
         updateSpan
       ]) => ({
+        cacheValue,
+        cacheId,
         putEventProcess,
         putEventResolution,
         putEventRejection,
@@ -119,21 +139,31 @@ const prepareStatements = (db: Database) =>
 const run = (statement: Statement) =>
   encaseP((values: any) => statement.run(values));
 
+const get = (statement: Statement) =>
+  encaseP((values: any) => statement.get(values));
+
 export const bind = (db: Database) =>
   prepareStatements(db).pipe(
     map(statements => {
       const updateSpan = (id: string) => () =>
         run(statements.updateSpan)({ $id: id });
 
+      const cache = ($value: any) =>
+        run(statements.cacheValue)({ $value })
+          .pipe(chain(() => get(statements.cacheId)({ $value })))
+          .pipe(map(row => row.rowid));
+
       const putEventProcess = (event: ProcessEvent) =>
-        all([
-          value.encode(event.process.input),
-          value.encode(event.process.context?.values ?? undefined)
+        seq([
+          value.encode(event.process.input).pipe(chain(cache)),
+          value
+            .encode(event.process.context?.values ?? undefined)
+            .pipe(chain(cache))
         ])
           .pipe(
-            map(([$input, $contextValues]) => ({
-              $input,
-              $contextValues,
+            map(([$inputId, $contextValuesId]) => ({
+              $inputId,
+              $contextValuesId,
               $timestamp: event.timestamp,
               $processSpecName: event.process.spec.name,
               $processId: event.process.id,
@@ -148,11 +178,12 @@ export const bind = (db: Database) =>
       const putEventRejection = (event: RejectionEvent) =>
         error
           .encode(event.reason)
+          .pipe(chain(cache))
           .pipe(
-            map($reason => ({
+            map($reasonId => ({
               $id: event.id,
               $timestamp: event.timestamp,
-              $reason
+              $reasonId
             }))
           )
           .pipe(chain(run(statements.putEventRejection)))
@@ -161,11 +192,12 @@ export const bind = (db: Database) =>
       const putEventResolution = (event: ResolutionEvent) =>
         value
           .encode(event.value)
+          .pipe(chain(cache))
           .pipe(
-            map($value => ({
+            map($valueId => ({
               $id: event.id,
               $timestamp: event.timestamp,
-              $value
+              $valueId
             }))
           )
           .pipe(chain(run(statements.putEventResolution)))
