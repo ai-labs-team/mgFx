@@ -1,8 +1,8 @@
 {
-  "name": "analyzer-gui",
+  "name": "@mgfx/analyzer-gui",
   "productName": "analyzer-gui",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "A Desktop client for analyzing mgFx applications",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
