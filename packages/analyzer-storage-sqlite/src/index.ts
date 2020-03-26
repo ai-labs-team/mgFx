@@ -65,7 +65,7 @@ export const sqlite: Initializer<Partial<Config>> = config => {
                 spans
                   .buildQuery(params)
                   .pipe(chain(runQuery))
-                  .pipe(chain(spans.formatResult))
+                  .pipe(chain(spans.formatResult(params)))
             }
           }))
         );

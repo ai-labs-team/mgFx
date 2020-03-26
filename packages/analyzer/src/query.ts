@@ -57,6 +57,10 @@ export type SpanParameters = Partial<{
     field: 'createdAt' | 'resolvedAt' | 'rejectedAt' | 'cancelledAt';
     direction: 'asc' | 'desc';
   };
+  /**
+   * If specified, input, output and context values will be omitted from query results
+   */
+  compact: boolean;
 }>;
 
 /**
@@ -71,16 +75,16 @@ export type Span = {
       name: string;
     };
   };
-  input: any;
+  input?: any;
   context?: {
     id: string;
     parentId: string;
-    values: Values;
+    values?: Values;
   };
 } & (
   | { state: 'running' }
-  | { state: 'resolved'; resolvedAt: number; value: any }
-  | { state: 'rejected'; rejectedAt: number; reason: any }
+  | { state: 'resolved'; resolvedAt: number; value?: any }
+  | { state: 'rejected'; rejectedAt: number; reason?: any }
   | { state: 'cancelled'; cancelledAt: number }
 );
 

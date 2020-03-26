@@ -39,7 +39,8 @@ const queryParams = {
           asc: null,
           desc: null
         })
-      })
+      }),
+      compact: t.boolean
     })
   )
 };

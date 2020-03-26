@@ -65,6 +65,8 @@ const analyzer = makeAnalyzer({ storage: sqlite({ filename }) });
 connector.serveModule({ add, sum, div, avg });
 connector.use(analyzer.collector);
 
+const ctx = connector.createContext({ isTest: true });
+
 const tryCleanup = async () => {
   try {
     await unlink(filename);
@@ -77,9 +79,9 @@ const tryCleanup = async () => {
 
 beforeAll(async () => {
   await tryCleanup();
-  await connector.run(avg([1, 2, 3])).pipe(promise);
+  await ctx.run(avg([1, 2, 3])).pipe(promise);
   try {
-    await connector.run(div([1, 0])).pipe(promise);
+    await ctx.run(div([1, 0])).pipe(promise);
   } catch {}
 
   // Artificial wait for async. analysis to finish
@@ -181,5 +183,19 @@ describe('query.spans', () => {
       .pipe(promise);
 
     expect(spans).toHaveLength(6);
+  });
+
+  it('omits values if `compact` parameter is specified', async () => {
+    const spans = await analyzer.query
+      .spans({ compact: true })
+      .get()
+      .pipe(promise);
+
+    spans.forEach(span => {
+      expect(span).not.toHaveProperty('input');
+      expect(span).not.toHaveProperty('value');
+      expect(span).not.toHaveProperty('reason');
+      expect(span.context).not.toHaveProperty('values');
+    });
   });
 });

@@ -55,7 +55,8 @@ export const buildQuery = (params: SpanParameters) =>
     return query;
   });
 
-export const formatResult = (rows: any[]) => all(rows.map(formatRow));
+export const formatResult = (params: SpanParameters) => (rows: any[]) =>
+  all(rows.map(formatRow(params)));
 
 const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
   query.select(
@@ -63,16 +64,21 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
     'spans.parent_id',
     'spans.created_at',
     'spans.process_spec_name',
-    'vc_input.content AS input',
     'spans.context_id',
     'spans.context_parent_id',
-    'vc_context.content AS context_values',
     'spans.state',
     'spans.resolved_at',
-    'vc_reason.content AS reason',
-    'spans.cancelled_at',
-    'vc_value.content AS value'
+    'spans.cancelled_at'
   );
+
+  if (params.compact !== true) {
+    query.select(
+      'vc_input.content AS input',
+      'vc_context.content AS context_values',
+      'vc_reason.content AS reason',
+      'vc_value.content AS value'
+    );
+  }
 };
 
 const applyJoins = (query: knex.QueryBuilder, params: SpanParameters) => {
@@ -125,15 +131,23 @@ const buildRecursiveQuery = (
         })
     );
 
-const formatRow = (row: any) => {
-  const decodes = [value.decode(row.input), value.decode(row.context_values)];
+const formatRow = (params: SpanParameters) => (row: any) => {
+  const decodes = [];
 
-  if (row.state === 1) {
+  if (!params.compact) {
+    decodes.push(value.decode(row.input));
+  }
+
+  if (!params.compact) {
+    decodes.push(value.decode(row.context_values));
+  }
+
+  if (row.state === 1 && !params.compact) {
     // resolved
     decodes.push(value.decode(row.value));
   }
 
-  if (row.state === 2) {
+  if (row.state === 2 && !params.compact) {
     // rejected
     decodes.push(value.decode(row.reason));
   }
@@ -150,49 +164,53 @@ const formatRow = (row: any) => {
               name: row.process_spec_name
             }
           },
-          input,
           context: row.context_id
             ? {
                 id: row.context_id,
-                parentId: row.context_parent_id,
-                values: contextValues
+                parentId: row.context_parent_id
               }
             : undefined,
           state: STATE_VALUES[row.state] as any
         };
 
-        if (row.state === 0) {
-          // running
-          return span;
+        if (!params.compact) {
+          Object.assign(span, { input });
+
+          if (row.context_id) {
+            Object.assign(span.context, { values: contextValues });
+          }
         }
 
         if (row.state === 1) {
           // resolved
-          return {
-            ...span,
-            resolvedAt: row.resolved_at,
-            value: valueOrReason
-          };
+          Object.assign(span, {
+            resolvedAt: row.resolved_at
+          });
+
+          if (!params.compact) {
+            Object.assign(span, { value: valueOrReason });
+          }
         }
 
         if (row.state === 2) {
           // rejected
-          return {
-            ...span,
-            rejectedAt: row.rejected_at,
-            reason: valueOrReason
-          };
+          Object.assign(span, {
+            rejectedAt: row.rejected_at
+          });
+
+          if (!params.compact) {
+            Object.assign(span, { reason: valueOrReason });
+          }
         }
 
         if (row.state === 3) {
           // cancelled
-          return {
-            ...span,
+          Object.assign(span, {
             cancelledAt: row.cancelled_at
-          };
+          });
         }
 
-        throw new Error(`Unable to format Span with Process ID ${row.id}`);
+        return span;
       }
     )
   );
