@@ -29,6 +29,7 @@
     "@types/qs": "^6.9.1",
     "@types/supertest": "^2.0.8",
     "eventsource": "^1.0.7",
+    "mgfx": "0.3.0",
     "node-fetch": "2.6.0",
     "supertest": "^4.0.2"
   },
