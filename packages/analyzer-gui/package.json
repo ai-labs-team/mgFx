@@ -2,7 +2,7 @@
   "name": "@mgfx/analyzer-gui",
   "private": true,
   "productName": "analyzer-gui",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A Desktop client for analyzing mgFx applications",
   "main": ".webpack/main",
   "scripts": {
@@ -90,7 +90,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.24.0",
-    "@mgfx/analyzer-http-client": "^0.3.2",
+    "@mgfx/analyzer-http-client": "^0.3.3",
     "@types/classnames": "^2.2.10",
     "@types/ramda": "^0.26.44",
     "classnames": "^2.2.6",
