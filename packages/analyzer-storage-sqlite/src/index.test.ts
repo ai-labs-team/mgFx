@@ -198,4 +198,18 @@ describe('query.spans', () => {
       expect(span.context).not.toHaveProperty('values');
     });
   });
+
+  it('correctly handles `compact: true` and `scope.input.eq`', async () => {
+    const spans = await analyzer.query
+      .spans({ compact: true, scope: { input: { eq: [2, 1] } } })
+      .get()
+      .pipe(promise);
+
+    spans.forEach(span => {
+      expect(span).not.toHaveProperty('input');
+      expect(span).not.toHaveProperty('value');
+      expect(span).not.toHaveProperty('reason');
+      expect(span.context).not.toHaveProperty('values');
+    });
+  });
 });

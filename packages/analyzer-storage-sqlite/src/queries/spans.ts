@@ -82,13 +82,20 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
 };
 
 const applyJoins = (query: knex.QueryBuilder, params: SpanParameters) => {
-  query
-    .leftJoin(
+  if (params.scope?.input || params.compact !== true) {
+    query.leftJoin(
       'value_cache AS vc_input',
       'spans.input_id',
       '=',
       'vc_input.rowid'
-    )
+    );
+  }
+
+  if (params.compact === true) {
+    return;
+  }
+
+  query
     .leftJoin(
       'value_cache AS vc_context',
       'spans.context_values_id',
