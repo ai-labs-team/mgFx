@@ -37,6 +37,9 @@ export const sqlite: Initializer<Partial<Config>> = config => {
           return db.all(sql, bindings);
         });
 
+        db.run('PRAGMA synchronous = NORMAL');
+        db.run('PRAGMA journal_mode = WAL');
+
         return bind(db).pipe(
           map(boundStatements => ({
             put: {
