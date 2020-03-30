@@ -1,6 +1,5 @@
 import React from 'react';
 import { useKefir } from 'use-kefir';
-import { Span, SpanParameters } from '@mgfx/analyzer';
 import SplitPane from 'react-split-pane';
 import { tap } from 'ramda';
 
@@ -14,10 +13,13 @@ import { SpanList } from './Log/SpanList';
 
 import './Log.scss';
 
+// 'ideal' maximum number of updates per second, used to calculate observer throttling period
+const TARGET_UPS = 4;
+
 export const Log: React.FC = () => {
   const inspectorPosition = useKey('inspectorPosition');
   const { client } = useAppContext();
-  const [selectedSpan, setSelectedSpan] = React.useState<Span | undefined>();
+  const [selectedId, setSelectedId] = React.useState<string | undefined>();
   const [error, setError] = React.useState<any>();
   const [isStale, setIsStale] = React.useState(true);
 
@@ -29,8 +31,12 @@ export const Log: React.FC = () => {
 
   const spans = useKefir(
     client.query
-      .spans(params)
+      .spans({
+        ...params,
+        compact: true
+      })
       .watch()
+      .throttle(Math.floor(1000 / TARGET_UPS))
       .mapErrors(
         tap(error => {
           setError(error);
@@ -46,15 +52,6 @@ export const Log: React.FC = () => {
     [client, params]
   );
 
-  React.useEffect(() => {
-    if (selectedSpan) {
-      const match = spans.find(span => span.id === selectedSpan.id);
-      if (match) {
-        setSelectedSpan(match);
-      }
-    }
-  }, [spans]);
-
   return (
     <div className="log">
       <SplitPane
@@ -66,14 +63,11 @@ export const Log: React.FC = () => {
           <ErrorBar error={error} />
           <SpanList
             spans={isStale ? [] : spans}
-            selected={selectedSpan}
-            onSelect={setSelectedSpan}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
           />
         </div>
-        <Inspector
-          span={selectedSpan}
-          onClose={() => setSelectedSpan(undefined)}
-        />
+        <Inspector span={selectedId} onClose={() => setSelectedId(undefined)} />
       </SplitPane>
     </div>
   );

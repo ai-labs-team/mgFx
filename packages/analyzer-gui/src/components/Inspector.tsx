@@ -1,6 +1,8 @@
 import React from 'react';
 import { Span } from '@mgfx/analyzer';
 import {
+  Code,
+  Pre,
   Tabs,
   Tab,
   Popover,
@@ -8,8 +10,10 @@ import {
   Menu,
   NonIdealState
 } from '@blueprintjs/core';
+import { useKefir } from 'use-kefir';
 
 import { config } from '../config';
+import { useAppContext } from '../contexts/App';
 import { useKey } from '../hooks/useConfig';
 import { IOTab } from './Inspector/IOTab';
 import { SummaryTab } from './Inspector/SummaryTab';
@@ -17,16 +21,47 @@ import { SummaryTab } from './Inspector/SummaryTab';
 import './Inspector.scss';
 
 type Props = {
-  span?: Span;
+  span?: string;
   onClose: () => void;
 };
 
 export const Inspector: React.FC<Props> = ({ span, onClose }) => {
   const inspectorPosition = useKey('inspectorPosition');
+  const { client } = useAppContext();
 
   const [selectedTab, setSelectedTab] = React.useState('io');
+  const [isStale, setIsStale] = React.useState(true);
+  const [error, setError] = React.useState<any>();
+
+  const selectedSpan = useKefir<Span | undefined>(
+    client.query
+      .spans({ scope: { id: span }, limit: 1 })
+      .watch()
+      .withHandler<Span, Span[]>((emitter, event) => {
+        if (event.type === 'error') {
+          setError(event.value);
+          return;
+        }
+
+        if (event.type === 'end') {
+          return;
+        }
+
+        const [span] = event.value;
+        emitter.emit(span);
+        setError(undefined);
+        setIsStale(false);
+
+        if (span.state !== 'running') {
+          emitter.end();
+        }
+      }),
+    undefined,
+    [span]
+  );
+
   const tabContent = React.useMemo(() => {
-    if (!span) {
+    if (!selectedSpan) {
       return (
         <NonIdealState
           icon="help"
@@ -36,14 +71,47 @@ export const Inspector: React.FC<Props> = ({ span, onClose }) => {
       );
     }
 
+    if (isStale) {
+      return (
+        <NonIdealState
+          icon="time"
+          title="Loading Process"
+          description={
+            <span>
+              Loading Process ID <Code>{span}</Code>...
+            </span>
+          }
+        />
+      );
+    }
+
+    if (error) {
+      return (
+        <NonIdealState
+          icon="error"
+          title="Failed to load Process"
+          description={
+            <>
+              <Code>{error.name}</Code>
+              <Pre>{error.message}</Pre>
+            </>
+          }
+        />
+      );
+    }
+
     if (selectedTab === 'io') {
-      return <IOTab span={span} />;
+      return <IOTab span={selectedSpan} />;
     }
 
     if (selectedTab === 'summary') {
-      return <SummaryTab span={span} />;
+      return <SummaryTab span={selectedSpan} />;
     }
-  }, [span, selectedTab, inspectorPosition]);
+  }, [selectedTab, selectedSpan, isStale, error, inspectorPosition]);
+
+  React.useEffect(() => {
+    setIsStale(true);
+  }, [span]);
 
   return (
     <div className="inspector">

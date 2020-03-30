@@ -60,6 +60,8 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
     <dl className="summary-tab">
       <dt className={Classes.TEXT_MUTED}>Task Name</dt>
       <dd className={Classes.MONOSPACE_TEXT}>{span.process.spec.name}</dd>
+      <dt className={Classes.TEXT_MUTED}>Process ID</dt>
+      <dd className={Classes.MONOSPACE_TEXT}>{span.id}</dd>
       <dt className={Classes.TEXT_MUTED}>Started At</dt>
       <dd>{new Date(span.createdAt).toLocaleString()}</dd>
       <dt className={Classes.TEXT_MUTED}>State</dt>
