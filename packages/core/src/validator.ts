@@ -11,27 +11,28 @@ import {
 /**
  * The base class from which all Validator-error related classes inherit.
  */
-export class ValidationError extends CustomError {}
+export class ValidationError<T> extends CustomError {
+  constructor(public readonly errors: T) {
+    super();
+  }
+}
 
 /**
  * The specialized error class used to emit validation failures on Task inputs.
  */
-export class InputValidationError extends ValidationError {}
+export class InputValidationError<T> extends ValidationError<T> {}
 
 /**
  * The specialized error class used to emit validation failures on Task outputs.
  */
-export class OutputValidationError extends ValidationError {}
+export class OutputValidationError<T> extends ValidationError<T> {}
 
 /**
  * The specialized error class used to emit validation failures on Context values.
  */
-export class ContextValidationError extends ValidationError {
-  public readonly contextKey: string;
-
-  constructor(key: string, message: any) {
-    super(message);
-    this.contextKey = key;
+export class ContextValidationError<T, K> extends ValidationError<T> {
+  constructor(public readonly contextKey: K, errors: T) {
+    super(errors);
   }
 }
 
@@ -43,7 +44,9 @@ export class ContextValidationError extends ValidationError {
  * defines the design-time type of the value that should pass validation to insure correct type inference at
  * design-time.
  */
-export type Validator<T> = (value: T) => FutureInstance<ValidationError, T>;
+export type Validator<T> = (
+  value: T
+) => FutureInstance<ValidationError<any>, T>;
 
 /**
  * Allows Context values to be validated as individual key/value pairs, and valid context key names to be inferred and

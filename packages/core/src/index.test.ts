@@ -5,11 +5,10 @@ import {
   reject,
   rejectAfter,
   chain,
-  fork,
   go
 } from 'fluture';
 
-import { localConnector, define, implement } from './index';
+import { localConnector, define, implement, fork } from './index';
 import { Validator } from './validator';
 import { makeInstrumenter, Event } from './middleware/instrumenter';
 import * as utils from './test-utils';
@@ -109,7 +108,7 @@ describe('validation', () => {
         mgFx.run(invalidInput('hi!'))
       ).pipe(promise);
     } catch (err) {
-      expect(err.message).toBe('Invalid data: hi!');
+      expect(err.errors).toBe('Invalid data: hi!');
     }
 
     expect(called).toBe(false);
@@ -131,7 +130,7 @@ describe('validation', () => {
         mgFx.run(invalidOutput('World'))
       ).pipe(promise);
     } catch (err) {
-      expect(err.message).toBe('Invalid data: Hello World!');
+      expect(err.errors).toBe('Invalid data: Hello World!');
     }
   });
 });
@@ -181,7 +180,7 @@ describe('context', () => {
         return context.run(greet('World'));
       }).pipe(promise);
     } catch (err) {
-      expect(err.message).toBe('Invalid data: Good morning');
+      expect(err.errors).toBe('Invalid data: Good morning');
       expect(err.contextKey).toBe('greeting');
     }
 
@@ -314,8 +313,7 @@ describe('instrumentation', () => {
 
     await withImplementations({ slowSum, div, average })(_ =>
       go(function*() {
-        const toBackground = fork(_ => {})(_ => {});
-        const cancel = mgFx.run(average([1, 2, 3])).pipe(toBackground);
+        const cancel = mgFx.run(average([1, 2, 3])).pipe(fork.toBackground);
 
         yield after(50)(undefined);
         cancel();
