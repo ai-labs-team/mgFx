@@ -67,7 +67,7 @@ export type TypeOf<T> = T extends Validator<infer U> ? U : never;
  */
 export const validateInput = <T>(validator: Validator<T>, value: T) =>
   validator(value).pipe(
-    chainRej(reason => reject(new InputValidationError(reason.message)))
+    chainRej(reason => reject(new InputValidationError(reason.errors)))
   );
 
 /**
@@ -76,7 +76,7 @@ export const validateInput = <T>(validator: Validator<T>, value: T) =>
  */
 export const validateOutput = <T>(validator: Validator<T>, value: T) =>
   validator(value).pipe(
-    chainRej(reason => reject(new OutputValidationError(reason.message)))
+    chainRej(reason => reject(new OutputValidationError(reason.errors)))
   );
 
 /**
@@ -103,9 +103,7 @@ export const validateContext = <T>(
     const value = context.values[key as keyof T];
 
     return validator(value).pipe(
-      chainRej(reason =>
-        reject(new ContextValidationError(key, reason.message))
-      )
+      chainRej(reason => reject(new ContextValidationError(key, reason.errors)))
     );
   });
 

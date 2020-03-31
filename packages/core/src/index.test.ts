@@ -9,7 +9,7 @@ import {
 } from 'fluture';
 
 import { localConnector, define, implement, fork } from './index';
-import { Validator } from './validator';
+import { Validator, ValidationError } from './validator';
 import { makeInstrumenter, Event } from './middleware/instrumenter';
 import * as utils from './test-utils';
 
@@ -18,7 +18,7 @@ const mgFx = localConnector();
 const validateAny: Validator<any> = resolve;
 const validateVoid: Validator<void> = resolve;
 const invalidateAny: Validator<any> = (value: unknown) =>
-  reject(new Error(`Invalid data: ${value}`)) as any;
+  reject(new ValidationError(`Invalid data: ${value}`)) as any;
 
 const withImplementation = utils.withImplementation(mgFx);
 const withImplementations = utils.withImplementations(mgFx);
