@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.1...@mgfx/analyzer-gui@1.2.2) (2020-03-31)
+
+
+### Performance Improvements
+
+* analyzer-gui: virtualized process list ([4e29a06](https://github.com/ai-labs-team/mgFx/commit/4e29a06))
+
+
+
+
+
 ## [1.2.1](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.0...@mgfx/analyzer-gui@1.2.1) (2020-03-26)
 
 **Note:** Version bump only for package @mgfx/analyzer-gui

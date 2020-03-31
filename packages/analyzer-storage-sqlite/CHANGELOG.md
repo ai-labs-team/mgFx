@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@1.0.0...@mgfx/analyzer-storage-sqlite@1.0.1) (2020-03-31)
+
+
+### Performance Improvements
+
+* analyzer-storage-sqlite: tune pragmas ([04e7101](https://github.com/ai-labs-team/mgFx/commit/04e7101))
+
+
+
+
+
 # [1.0.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@0.1.2...@mgfx/analyzer-storage-sqlite@1.0.0) (2020-03-26)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/validator-iots@0.1.5...@mgfx/validator-iots@0.2.0) (2020-03-31)
+
+
+### Features
+
+* validator-iots: better error reporting ([efdf539](https://github.com/ai-labs-team/mgFx/commit/efdf539))
+
+
+
+
+
 ## [0.1.5](https://github.com/ai-labs-team/mgFx/compare/@mgfx/validator-iots@0.1.4...@mgfx/validator-iots@0.1.5) (2020-03-16)
 
 **Note:** Version bump only for package @mgfx/validator-iots
