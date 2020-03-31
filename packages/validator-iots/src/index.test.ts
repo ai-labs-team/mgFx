@@ -20,8 +20,12 @@ it('rejects invalid values', async () => {
     await validator({ greeting: 123 as any }).pipe(promise);
   } catch (err) {
     expect(err).toBeInstanceOf(ValidationError);
-    expect(err.message).toBe(
-      'Invalid value 123 supplied to : { greeting: string }/greeting: string'
-    );
+    expect(err.errors).toEqual([
+      {
+        path: ['greeting'],
+        expected: 'string',
+        actual: 123
+      }
+    ]);
   }
 });
