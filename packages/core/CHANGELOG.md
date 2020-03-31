@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.4.0...mgfx@0.4.1) (2020-03-31)
+
+
+### Bug Fixes
+
+* core: propagate error information during validation ([e90d51d](https://github.com/ai-labs-team/mgFx/commit/e90d51d))
+
+
+
+
+
 # [0.4.0](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.3.0...mgfx@0.4.0) (2020-03-31)
 
 
