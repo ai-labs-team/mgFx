@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-http-server",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "HTTP-based Server for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -30,8 +30,8 @@
     "mgfx": "0.2.1"
   },
   "devDependencies": {
-    "@mgfx/analyzer": "^0.4.2",
-    "@mgfx/analyzer-storage-sqlite": "^1.0.2",
+    "@mgfx/analyzer": "^0.4.3",
+    "@mgfx/analyzer-storage-sqlite": "^1.0.3",
     "@types/compression": "^1.7.0",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"

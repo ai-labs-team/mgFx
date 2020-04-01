@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Real-time, persistent analyzer of mgFx instrumentation data",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,11 +22,11 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "@mgfx/validator-iots": "^0.2.1",
+    "@mgfx/validator-iots": "^0.2.2",
     "fast-equals": "^2.0.0",
     "fluture": "^12.2.0",
     "kefir": "^3.8.6",
-    "mgfx": "^0.4.1"
+    "mgfx": "^0.5.0"
   },
   "devDependencies": {
     "@types/kefir": "^3.8.2"

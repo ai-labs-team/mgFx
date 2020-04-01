@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.10](https://github.com/ai-labs-team/mgFx/compare/@mgfx/connector-redis@0.1.9...@mgfx/connector-redis@0.1.10) (2020-04-01)
+
+**Note:** Version bump only for package @mgfx/connector-redis
+
+
+
+
+
 ## [0.1.9](https://github.com/ai-labs-team/mgFx/compare/@mgfx/connector-redis@0.1.8...@mgfx/connector-redis@0.1.9) (2020-03-31)
 
 **Note:** Version bump only for package @mgfx/connector-redis
