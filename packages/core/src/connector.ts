@@ -10,6 +10,7 @@
  * provide the transport between `exec` and `provide`.
  */
 import { FutureInstance, attempt, chain, map, parallel } from 'fluture';
+import { fluent, Fluent } from 'fluenture';
 
 import {
   ContextOf,
@@ -61,7 +62,7 @@ export type EnvironmentInitializer<S extends Spec = Spec> = (
  */
 export type RunFn = <S extends Spec>(
   process: FutureInstance<any, Process<S>>
-) => FutureInstance<any, OutputOf<S>>;
+) => Fluent<any, OutputOf<S>>;
 
 /**
  * The 'serve' function allows an Implementation object to be registered against a Connector, allowing it to execute
@@ -152,17 +153,22 @@ export const makeConnector = (config: Config): Connector => {
     use: middleware.use,
 
     run: process =>
-      middleware.apply.pre(process).pipe(
-        chain(process =>
-          parallel(Infinity)([
-            validateInput(process.spec.input, process.input),
-            validateContext(process.spec.context, process.context)
-          ])
-            .pipe(chain(_ => config.dispatch(process)))
-            .pipe(chain(output => validateOutput(process.spec.output, output)))
-            .pipe(future => middleware.apply.post(future, process))
+      middleware.apply
+        .pre(process)
+        .pipe(
+          chain(process =>
+            parallel(Infinity)([
+              validateInput(process.spec.input, process.input),
+              validateContext(process.spec.context, process.context)
+            ])
+              .pipe(chain(_ => config.dispatch(process)))
+              .pipe(
+                chain(output => validateOutput(process.spec.output, output))
+              )
+              .pipe(future => middleware.apply.post(future, process))
+          )
         )
-      ),
+        .pipe(fluent),
 
     serve: ({ spec, implementation }) =>
       config.provide(

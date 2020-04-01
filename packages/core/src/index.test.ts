@@ -15,6 +15,7 @@ import * as utils from './test-utils';
 
 const mgFx = localConnector();
 
+const validateString: Validator<String> = resolve;
 const validateAny: Validator<any> = resolve;
 const validateVoid: Validator<void> = resolve;
 const invalidateAny: Validator<any> = (value: unknown) =>
@@ -337,4 +338,42 @@ describe('local connector', () => {
       expect(err.name).toBe('NoImplementationError');
     }
   });
+});
+
+it('offers a fluent interface to callers', async () => {
+  const syncGreet = implement(
+    define({
+      name: 'syncGreet',
+      input: validateString,
+      output: validateString
+    }),
+    name => `Hello ${name}!`
+  );
+
+  const result = await withImplementation(syncGreet)(_ =>
+    mgFx
+      .run(syncGreet('World'))
+      .map(str => str.length)
+      .map(x => x + 1)
+  ).pipe(promise);
+
+  expect(result).toBe(13);
+});
+
+it('offers a fluent interface to Tasks', async () => {
+  const averageF = implement(
+    define({
+      name: 'average',
+      input: validateAny,
+      output: validateAny
+    }),
+    (xs: number[], { runChild }) =>
+      runChild(sum(xs)).chain(sum => runChild(div([sum, xs.length])))
+  );
+
+  const result = await withImplementations({ sum, div, averageF })(_ => {
+    return mgFx.run(averageF([4, 8, 15, 16, 23, 42]));
+  }).pipe(promise);
+
+  expect(result).toBe(18);
 });
