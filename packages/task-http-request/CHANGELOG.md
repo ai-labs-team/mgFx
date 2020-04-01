@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-http-request@0.2.2...@mgfx/task-http-request@0.3.0) (2020-04-01)
+
+
+### Features
+
+* task-http-request: Include response details in errors ([cdbb288](https://github.com/ai-labs-team/mgFx/commit/cdbb288))
+
+
+
+
+
 ## [0.2.2](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-http-request@0.2.1...@mgfx/task-http-request@0.2.2) (2020-03-31)
 
 **Note:** Version bump only for package @mgfx/task-http-request
