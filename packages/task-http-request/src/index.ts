@@ -2,6 +2,7 @@ import { define, implement } from 'mgfx';
 import { ioTs, t } from '@mgfx/validator-iots';
 import axios, { AxiosError } from 'axios';
 import { Future } from 'fluture';
+import { HttpRequestError } from './error';
 
 export const httpRequest = implement(
   define({
@@ -55,7 +56,7 @@ export const httpRequest = implement(
           )
         )
         .catch((error: AxiosError) => {
-          reject(new Error(error.message));
+          reject(new HttpRequestError(error.message, error.response));
         });
 
       return () => {

@@ -25,7 +25,8 @@
     "@mgfx/validator-iots": "^0.2.1",
     "axios": "^0.19.2",
     "bull": "^3.13.0",
-    "mgfx": "^0.4.1"
+    "mgfx": "^0.4.1",
+    "ts-custom-error": "^3.1.1"
   },
   "jest": {
     "preset": "ts-jest",
