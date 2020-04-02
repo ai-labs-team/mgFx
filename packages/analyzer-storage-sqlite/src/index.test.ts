@@ -275,7 +275,7 @@ describe('query.spans', () => {
       await connector
         .run(couldFail(0))
         .alt(resolve('ok'))
-        .chain(after(1000))
+        .chain(after(10))
         .promise();
 
       const spans = await analyzer.query
@@ -299,7 +299,7 @@ describe('query.spans', () => {
         .run(add([1, 0]))
         .chain(after(10))
         .and(ctx.run(add([0, 1])))
-        .chain(after(1000))
+        .chain(after(10))
         .promise();
 
       const spans = await analyzer.query
@@ -325,7 +325,7 @@ describe('query.spans', () => {
         .chain(after(10))
         .and(ctx.run(div([1, 0])))
         .alt(resolve(undefined))
-        .chain(after(1000))
+        .chain(after(10))
         .promise();
 
       const spans = await analyzer.query

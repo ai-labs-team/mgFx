@@ -204,6 +204,8 @@ const applyGroup = (query: knex.QueryBuilder, params: SpanParameters) => {
     return;
   }
 
+  query.havingRaw('max(created_at)');
+
   if (params.distinct === 'input') {
     return query.groupBy('input_id');
   }
