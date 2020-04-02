@@ -57,7 +57,8 @@
                   "name": "main_window"
                 }
               ]
-            }
+            },
+            "loggerPort": "9001"
           }
         ]
       ]
