@@ -31,7 +31,7 @@ export declare class Fluenture<A, B> {
     withRight: (right: B) => D
   ): Fluent<C, D>;
 
-  public both<C>(future: Future<A, C>): Fluent<A, [B, C]>;
+  public both<C, D>(future: Future<C, D>): Fluent<A | C, [D, B]>;
 
   public cache(): this;
 
@@ -70,5 +70,5 @@ export declare class Fluenture<A, B> {
 
   public promise(): Promise<B>;
 
-  public value(withLeft: (reason: A) => any): Cancel;
+  public value(withRight: (value: B) => any): Cancel;
 }
