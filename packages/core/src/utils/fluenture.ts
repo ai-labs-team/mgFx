@@ -7,7 +7,9 @@ import { FutureInstance, Cancel } from 'fluture';
  */
 export type Future<A, B> = FutureInstance<A, B> | Fluenture<A, B>;
 
-export type Fluent<A, B> = FutureInstance<A, B> & Fluenture<A, B>;
+// Important: Fluenture needs to be placed *before* FutureInstance so that Fluenture's specialized `pipe` implementation
+// takes priority over the 'vanilla' implementation when TypeScript is trying to select the appropriate overload.
+export type Fluent<A, B> = Fluenture<A, B> & FutureInstance<A, B>;
 
 export declare function fluent<A, B>(future: Future<A, B>): Fluent<A, B>;
 
