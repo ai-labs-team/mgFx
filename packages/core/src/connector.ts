@@ -10,7 +10,6 @@
  * provide the transport between `exec` and `provide`.
  */
 import { FutureInstance, attempt, chain, map, parallel } from 'fluture';
-import { fluent, Fluent } from 'fluenture';
 
 import {
   ContextOf,
@@ -25,6 +24,7 @@ import { Context, Values, makeContext } from './context';
 import { UseFn, makeContainer } from './middleware';
 import { validateContext, validateInput, validateOutput } from './validator';
 import { toFuture } from './utils';
+import { fluent, Fluent } from './utils/fluenture';
 
 /**
  * Like `ImplementationFunction`, except that it has been 'encased'; the function will always return a Future, even if
