@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.2...mgfx@0.5.3) (2020-04-02)
+
+
+### Bug Fixes
+
+* core: fluent pipe should take priority over original ([dba5562](https://github.com/ai-labs-team/mgFx/commit/dba5562))
+
+
+
+
+
 ## [0.5.2](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.1...mgfx@0.5.2) (2020-04-02)
 
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.4](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-http-request@0.3.3...@mgfx/task-http-request@0.3.4) (2020-04-02)
+
+**Note:** Version bump only for package @mgfx/task-http-request
+
+
+
+
+
 ## [0.3.3](https://github.com/ai-labs-team/mgFx/compare/@mgfx/task-http-request@0.3.2...@mgfx/task-http-request@0.3.3) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/task-http-request
