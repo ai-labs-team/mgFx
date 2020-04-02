@@ -41,7 +41,7 @@ const queryParams = {
           desc: null
         })
       }),
-      distinct: t.intersection([
+      distinct: t.union([
         t.keyof({
           input: null,
           output: null
