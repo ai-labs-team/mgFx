@@ -37,13 +37,7 @@ export const buildQuery = (params: SpanParameters) =>
 
     if (params.order) {
       const field =
-        params.order.field === 'createdAt'
-          ? 'created_at'
-          : params.order.field === 'resolvedAt'
-          ? 'resolved_at'
-          : params.order.field === 'rejectedAt'
-          ? 'rejected_at'
-          : 'cancelled_at';
+        params.order.field === 'createdAt' ? 'created_at' : 'ended_at';
 
       query.orderBy(field, params.order.direction);
     }
@@ -67,16 +61,14 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
     'spans.context_id',
     'spans.context_parent_id',
     'spans.state',
-    'spans.resolved_at',
-    'spans.cancelled_at'
+    'spans.ended_at'
   );
 
   if (params.compact !== true) {
     query.select(
       'vc_input.content AS input',
       'vc_context.content AS context_values',
-      'vc_reason.content AS reason',
-      'vc_value.content AS value'
+      'vc_output.content AS output'
     );
   }
 };
@@ -103,16 +95,10 @@ const applyJoins = (query: knex.QueryBuilder, params: SpanParameters) => {
       'vc_context.rowid'
     )
     .leftJoin(
-      'value_cache AS vc_value',
-      'spans.value_id',
+      'value_cache AS vc_output',
+      'spans.output_id',
       '=',
-      'vc_value.rowid'
-    )
-    .leftJoin(
-      'value_cache AS vc_reason',
-      'spans.reason_id',
-      '=',
-      'vc_reason.rowid'
+      'vc_output.rowid'
     );
 };
 
@@ -142,26 +128,17 @@ const formatRow = (params: SpanParameters) => (row: any) => {
   const decodes = [];
 
   if (!params.compact) {
-    decodes.push(value.decode(row.input));
-  }
+    decodes.push(value.decode(row.input), value.decode(row.context_values));
 
-  if (!params.compact) {
-    decodes.push(value.decode(row.context_values));
-  }
-
-  if (row.state === 1 && !params.compact) {
-    // resolved
-    decodes.push(value.decode(row.value));
-  }
-
-  if (row.state === 2 && !params.compact) {
-    // rejected
-    decodes.push(value.decode(row.reason));
+    if (row.state === 1 || row.state === 2) {
+      // resolved or rejected
+      decodes.push(value.decode(row.output));
+    }
   }
 
   return all(decodes).pipe(
     map(
-      ([input, contextValues, valueOrReason]): Span => {
+      ([input, contextValues, output]): Span => {
         const span = {
           id: row.id,
           parentId: row.parent_id || undefined,
@@ -188,33 +165,14 @@ const formatRow = (params: SpanParameters) => (row: any) => {
           }
         }
 
-        if (row.state === 1) {
-          // resolved
-          Object.assign(span, {
-            resolvedAt: row.resolved_at
-          });
-
-          if (!params.compact) {
-            Object.assign(span, { value: valueOrReason });
-          }
+        if (row.state !== 0) {
+          // not running
+          Object.assign(span, { endedAt: row.ended_at });
         }
 
-        if (row.state === 2) {
-          // rejected
-          Object.assign(span, {
-            rejectedAt: row.rejected_at
-          });
-
-          if (!params.compact) {
-            Object.assign(span, { reason: valueOrReason });
-          }
-        }
-
-        if (row.state === 3) {
-          // cancelled
-          Object.assign(span, {
-            cancelledAt: row.cancelled_at
-          });
+        if (!params.compact && (row.state === 1 || row.state === 2)) {
+          // resolved or rejected
+          Object.assign(span, { output });
         }
 
         return span;

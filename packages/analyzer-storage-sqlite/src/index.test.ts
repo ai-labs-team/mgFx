@@ -131,6 +131,8 @@ describe('query.spans', () => {
 
     expect(spans).toHaveLength(1);
     expect(spans[0].process.spec.name).toBe('div');
+    expect(spans[0].input).toEqual([6, 3]);
+    expect((spans[0] as any).output).toEqual(2);
   });
 
   it('selects spans matching state', async () => {
@@ -193,8 +195,7 @@ describe('query.spans', () => {
 
     spans.forEach(span => {
       expect(span).not.toHaveProperty('input');
-      expect(span).not.toHaveProperty('value');
-      expect(span).not.toHaveProperty('reason');
+      expect(span).not.toHaveProperty('output');
       expect(span.context).not.toHaveProperty('values');
     });
   });
@@ -207,8 +208,7 @@ describe('query.spans', () => {
 
     spans.forEach(span => {
       expect(span).not.toHaveProperty('input');
-      expect(span).not.toHaveProperty('value');
-      expect(span).not.toHaveProperty('reason');
+      expect(span).not.toHaveProperty('output');
       expect(span.context).not.toHaveProperty('values');
     });
   });
