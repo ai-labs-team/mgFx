@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.1...mgfx@0.5.2) (2020-04-02)
+
+
+### Bug Fixes
+
+* core: fix `#both` and `#value` fluent definitions ([0d123de](https://github.com/ai-labs-team/mgFx/commit/0d123de))
+
+
+
+
+
 ## [0.5.1](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.0...mgfx@0.5.1) (2020-04-02)
 
 

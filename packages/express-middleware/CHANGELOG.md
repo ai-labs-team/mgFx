@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.10](https://github.com/ai-labs-team/mgFx/compare/@mgfx/express-middleware@0.1.9...@mgfx/express-middleware@0.1.10) (2020-04-02)
+
+**Note:** Version bump only for package @mgfx/express-middleware
+
+
+
+
+
 ## [0.1.9](https://github.com/ai-labs-team/mgFx/compare/@mgfx/express-middleware@0.1.8...@mgfx/express-middleware@0.1.9) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/express-middleware
