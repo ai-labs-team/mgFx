@@ -24,6 +24,12 @@ export type SpanParameters = Partial<{
      */
     id: string;
     /**
+     * If specified, only Spans executed inside the Context with this ID will be selected.
+     */
+    context: {
+      id: string;
+    };
+    /**
      * If specified, only Spans matching the Process' Task Definition name will be selected.
      */
     spec: {
@@ -64,7 +70,11 @@ export type SpanParameters = Partial<{
   /**
    * If specified, only distinct Spans will be selected
    */
-  distinct: 'input' | 'output';
+  distinct:
+    | 'input'
+    | 'output'
+    | { input: { path: string[] } }
+    | { output: { path: string[] } };
 }>;
 
 /**

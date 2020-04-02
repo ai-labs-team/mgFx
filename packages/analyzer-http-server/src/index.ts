@@ -13,6 +13,9 @@ const queryParams = {
     t.partial({
       scope: t.partial({
         id: t.string,
+        context: t.type({
+          id: t.string
+        }),
         spec: t.type({
           name: t.string
         }),
@@ -38,10 +41,22 @@ const queryParams = {
           desc: null
         })
       }),
-      distinct: t.keyof({
-        input: null,
-        output: null
-      }),
+      distinct: t.intersection([
+        t.keyof({
+          input: null,
+          output: null
+        }),
+        t.type({
+          input: t.type({
+            path: t.array(t.string)
+          })
+        }),
+        t.type({
+          output: t.type({
+            path: t.array(t.string)
+          })
+        })
+      ]),
       compact: t.boolean
     })
   )

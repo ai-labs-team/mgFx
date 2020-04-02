@@ -13,6 +13,11 @@ export const buildQuery = (params: SpanParameters) =>
     let query = qb.from('spans');
     applySelects(query, params);
     applyJoins(query, params);
+    applyGroup(query, params);
+
+    if (params.scope?.context?.id) {
+      query.where('context_id', params.scope.context.id);
+    }
 
     if (params.scope?.spec?.name) {
       query.where('process_spec_name', params.scope.spec.name);
@@ -40,10 +45,6 @@ export const buildQuery = (params: SpanParameters) =>
         params.order.field === 'createdAt' ? 'created_at' : 'ended_at';
 
       query.orderBy(field, params.order.direction);
-    }
-
-    if (params.distinct) {
-      query.groupBy(params.distinct === 'input' ? 'input_id' : 'output_id');
     }
 
     if (params.scope?.id) {
@@ -78,7 +79,14 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
 };
 
 const applyJoins = (query: knex.QueryBuilder, params: SpanParameters) => {
-  if (params.scope?.input || params.compact !== true) {
+  const shouldJoinInput =
+    params.scope?.input ||
+    params.compact !== true ||
+    (params.distinct &&
+      typeof params.distinct === 'object' &&
+      'input' in params.distinct);
+
+  if (shouldJoinInput) {
     query.leftJoin(
       'value_cache AS vc_input',
       'spans.input_id',
@@ -87,7 +95,13 @@ const applyJoins = (query: knex.QueryBuilder, params: SpanParameters) => {
     );
   }
 
-  if (params.compact === true) {
+  const shouldJoinRest =
+    params.compact !== true ||
+    (params.distinct &&
+      typeof params.distinct === 'object' &&
+      'output' in params.distinct);
+
+  if (!shouldJoinRest) {
     return;
   }
 
@@ -183,4 +197,32 @@ const formatRow = (params: SpanParameters) => (row: any) => {
       }
     )
   );
+};
+
+const applyGroup = (query: knex.QueryBuilder, params: SpanParameters) => {
+  if (!params.distinct) {
+    return;
+  }
+
+  if (params.distinct === 'input') {
+    return query.groupBy('input_id');
+  }
+
+  if (params.distinct === 'output') {
+    return query.groupBy('output_id');
+  }
+
+  if ('input' in params.distinct) {
+    return query.groupByRaw(
+      'json_extract(vc_input.content, ?)',
+      params.distinct.input.path
+    );
+  }
+
+  if ('output' in params.distinct) {
+    return query.groupByRaw(
+      'json_extract(vc_output.content, ?)',
+      params.distinct.output.path
+    );
+  }
 };

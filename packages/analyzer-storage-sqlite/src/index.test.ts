@@ -66,10 +66,10 @@ let shouldFail = false;
 const couldFail = implement(
   define({
     name: 'couldFail',
-    input: ioTs(t.void),
-    output: ioTs(t.void)
+    input: ioTs(t.any),
+    output: ioTs(t.any)
   }),
-  () => (shouldFail ? reject('nope') : resolve(undefined))
+  val => (shouldFail ? reject('nope') : val)
 );
 
 const analyzer = makeAnalyzer({ storage: sqlite({ filename }) });
@@ -112,6 +112,45 @@ describe('query.spans', () => {
       .pipe(promise);
 
     expect(spans).toHaveLength(7);
+  });
+
+  it('selects all spans in a given context', async () => {
+    const ctxA = connector.createContext();
+    const ctxB = connector.createContext();
+
+    await ctxA
+      .run(add([1, 1]))
+      .and(ctxB.run(add([2, 2])))
+      .chain(after(100))
+      .promise();
+
+    const spansA = await analyzer.query
+      .spans({
+        scope: {
+          context: {
+            id: ctxA.id
+          }
+        }
+      })
+      .get()
+      .pipe(promise);
+
+    const spansB = await analyzer.query
+      .spans({
+        scope: {
+          context: {
+            id: ctxB.id
+          }
+        }
+      })
+      .get()
+      .pipe(promise);
+
+    expect(spansA).toHaveLength(1);
+    expect(spansA[0].input).toEqual([1, 1]);
+
+    expect(spansB).toHaveLength(1);
+    expect(spansB[0].input).toEqual([2, 2]);
   });
 
   it('selects spans matching spec name', async () => {
@@ -225,30 +264,89 @@ describe('query.spans', () => {
     });
   });
 
-  it('supports the `distinct` operator', async () => {
-    await connector
-      .run(couldFail())
-      .chain(after(100))
-      .promise();
+  describe('distinct operator', () => {
+    it('supports `input`', async () => {
+      await connector
+        .run(couldFail(0))
+        .chain(after(10))
+        .promise();
 
-    shouldFail = true;
-    await connector
-      .run(couldFail())
-      .alt(resolve('ok'))
-      .chain(after(100))
-      .promise();
+      shouldFail = true;
+      await connector
+        .run(couldFail(0))
+        .alt(resolve('ok'))
+        .chain(after(1000))
+        .promise();
 
-    const spans = await analyzer.query
-      .spans({
-        scope: { spec: { name: 'couldFail' } },
-        order: { field: 'endedAt', direction: 'asc' },
-        compact: true,
-        distinct: 'input'
-      })
-      .get()
-      .pipe(promise);
+      const spans = await analyzer.query
+        .spans({
+          scope: { spec: { name: 'couldFail' } },
+          order: { field: 'endedAt', direction: 'asc' },
+          compact: true,
+          distinct: 'input'
+        })
+        .get()
+        .pipe(promise);
 
-    expect(spans).toHaveLength(1);
-    expect(spans[0].state).toBe('rejected');
+      expect(spans).toHaveLength(1);
+      expect(spans[0].state).toBe('rejected');
+    });
+
+    it('supports `output`', async () => {
+      const ctx = connector.createContext();
+
+      await ctx
+        .run(add([1, 0]))
+        .chain(after(10))
+        .and(ctx.run(add([0, 1])))
+        .chain(after(1000))
+        .promise();
+
+      const spans = await analyzer.query
+        .spans({
+          scope: { spec: { name: 'add' }, context: { id: ctx.id } },
+          order: { field: 'endedAt', direction: 'asc' },
+          distinct: 'output'
+        })
+        .get()
+        .pipe(promise);
+
+      expect(spans).toHaveLength(1);
+      expect(spans[0].input).toEqual([0, 1]);
+    });
+
+    it('supports `input.path`', async () => {
+      const ctx = connector.createContext();
+
+      await ctx
+        .run(div([2, 1]))
+        .chain(after(10))
+        .and(ctx.run(div([1, 1])))
+        .chain(after(10))
+        .and(ctx.run(div([1, 0])))
+        .alt(resolve(undefined))
+        .chain(after(1000))
+        .promise();
+
+      const spans = await analyzer.query
+        .spans({
+          scope: { spec: { name: 'div' }, context: { id: ctx.id } },
+          order: { field: 'endedAt', direction: 'asc' },
+          distinct: {
+            input: {
+              path: ['$.v[0]']
+            }
+          }
+        })
+        .get()
+        .pipe(promise);
+
+      expect(spans).toHaveLength(2);
+      expect(spans[0].input).toEqual([2, 1]);
+      expect(spans[0].state).toBe('resolved');
+
+      expect(spans[1].input).toEqual([1, 0]);
+      expect(spans[1].state).toBe('rejected');
+    });
   });
 });
