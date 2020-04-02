@@ -38,6 +38,10 @@ const queryParams = {
           desc: null
         })
       }),
+      distinct: t.keyof({
+        input: null,
+        output: null
+      }),
       compact: t.boolean
     })
   )
