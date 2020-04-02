@@ -61,6 +61,10 @@ export type SpanParameters = Partial<{
    * If specified, input, output and context values will be omitted from query results
    */
   compact: boolean;
+  /**
+   * If specified, only distinct Spans will be selected
+   */
+  distinct: 'input' | 'output';
 }>;
 
 /**
