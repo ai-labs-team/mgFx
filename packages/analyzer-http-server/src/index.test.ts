@@ -46,7 +46,7 @@ afterAll(async () => {
 });
 
 describe('/collector', () => {
-  it('performs collects events received via HTTP', async () => {
+  it('collects events received via HTTP', async () => {
     await request(app)
       .post('/analyzer/collector')
       .set('Accept', 'application/json')
@@ -61,6 +61,8 @@ describe('/collector', () => {
           input: 'hello'
         }
       });
+
+    await new Promise(resolve => setTimeout(() => resolve(), 200));
 
     const runningResponse = await request(app)
       .get('/analyzer/query/spans')
@@ -91,6 +93,8 @@ describe('/collector', () => {
         value: 'world'
       });
 
+    await new Promise(resolve => setTimeout(() => resolve(), 200));
+
     const resolvedResponse = await request(app)
       .get('/analyzer/query/spans')
       .query({ q: JSON.stringify({ v: { scope: { id: 'test-1' } } }) })
@@ -100,7 +104,7 @@ describe('/collector', () => {
       {
         id: 'test-1',
         createdAt: 1,
-        resolvedAt: 2,
+        endedAt: 2,
         process: {
           spec: {
             name: 'test'
@@ -108,7 +112,7 @@ describe('/collector', () => {
         },
         input: 'hello',
         state: 'resolved',
-        value: 'world'
+        output: 'world'
       }
     ]);
   });
@@ -172,9 +176,9 @@ describe('/query/spans', () => {
           createdAt: expect.any(Number),
           id: processId,
           input: 'World',
-          resolvedAt: expect.any(Number),
+          endedAt: expect.any(Number),
           state: 'resolved',
-          value: 'Hello World!',
+          output: 'Hello World!',
           process: {
             spec: {
               name: 'greet'
@@ -230,9 +234,9 @@ describe('/query/spans/observe', () => {
             createdAt: expect.any(Number),
             id: processId,
             input: 'World',
-            resolvedAt: expect.any(Number),
+            endedAt: expect.any(Number),
             state: 'resolved',
-            value: 'Hello World!',
+            output: 'Hello World!',
             process: {
               spec: {
                 name: 'greet'

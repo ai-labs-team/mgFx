@@ -31,9 +31,7 @@ const queryParams = {
       order: t.type({
         field: t.keyof({
           createdAt: null,
-          resolvedAt: null,
-          rejectedAt: null,
-          cancelledAt: null
+          endedAt: null
         }),
         direction: t.keyof({
           asc: null,

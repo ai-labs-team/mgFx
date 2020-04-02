@@ -10728,15 +10728,6 @@ methods@^1.1.1, methods@^1.1.2, methods@~1.1.2:
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   integrity sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=
 
-mgfx@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/mgfx/-/mgfx-0.2.1.tgz#bfc6334413a0ea63a1d1d73569f11556e70f6b85"
-  integrity sha512-PAVY0z8RPrkqFbc+xXqTHnZG3AbhGm40oVcC6PEVCxVkeuW9lhrr64a1ojv0ZuKDTDlCEaW2YIruqd5n70o77g==
-  dependencies:
-    fluture "^12.2.0"
-    ts-custom-error "^3.1.1"
-    uuidv4 "^6.0.2"
-
 microevent.ts@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/microevent.ts/-/microevent.ts-0.1.1.tgz#70b09b83f43df5172d0205a63025bce0f7357fa0"
