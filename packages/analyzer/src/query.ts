@@ -54,7 +54,7 @@ export type SpanParameters = Partial<{
    * If specified, allows sorting the result set by a Span's Timestamp.
    */
   order: {
-    field: 'createdAt' | 'resolvedAt' | 'rejectedAt' | 'cancelledAt';
+    field: 'createdAt' | 'endedAt';
     direction: 'asc' | 'desc';
   };
   /**
@@ -83,9 +83,9 @@ export type Span = {
   };
 } & (
   | { state: 'running' }
-  | { state: 'resolved'; resolvedAt: number; value?: any }
-  | { state: 'rejected'; rejectedAt: number; reason?: any }
-  | { state: 'cancelled'; cancelledAt: number }
+  | { state: 'resolved'; endedAt: number; output?: any }
+  | { state: 'rejected'; endedAt: number; output?: any }
+  | { state: 'cancelled'; endedAt: number }
 );
 
 /**
