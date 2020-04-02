@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@2.0.0...@mgfx/analyzer-storage-sqlite@2.1.0) (2020-04-02)
+
+
+### Features
+
+* analyzer-*: support more query params ([e290e93](https://github.com/ai-labs-team/mgFx/commit/e290e93))
+
+
+
+
+
 # [2.0.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@1.0.6...@mgfx/analyzer-storage-sqlite@2.0.0) (2020-04-02)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.5.0...@mgfx/analyzer-http-server@0.6.0) (2020-04-02)
+
+
+### Features
+
+* analyzer-*: support more query params ([e290e93](https://github.com/ai-labs-team/mgFx/commit/e290e93))
+
+
+
+
+
 # [0.5.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.4.6...@mgfx/analyzer-http-server@0.5.0) (2020-04-02)
 
 
