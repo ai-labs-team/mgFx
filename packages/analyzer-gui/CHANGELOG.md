@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.10](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.9...@mgfx/analyzer-gui@1.2.10) (2020-04-02)
+
+
+### Bug Fixes
+
+* analyzer-gui: use new Span format ([e8dc62c](https://github.com/ai-labs-team/mgFx/commit/e8dc62c))
+
+
+
+
+
 ## [1.2.9](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.8...@mgfx/analyzer-gui@1.2.9) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/analyzer-gui
