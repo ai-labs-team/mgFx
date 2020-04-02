@@ -15,11 +15,13 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
       return null;
     }
 
+    const endedAt = new Date(span.endedAt).toLocaleString();
+
     if (span.state === 'resolved') {
       return (
         <>
           <dt className={Classes.TEXT_MUTED}>Resolved At</dt>
-          <dd>{new Date(span.resolvedAt).toLocaleString()}</dd>
+          <dd>{endedAt}</dd>
         </>
       );
     }
@@ -28,7 +30,7 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
       return (
         <>
           <dt className={Classes.TEXT_MUTED}>Rejected At</dt>
-          <dd>{new Date(span.rejectedAt).toLocaleString()}</dd>
+          <dd>{endedAt}</dd>
         </>
       );
     }
@@ -37,23 +39,14 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
       return (
         <>
           <dt className={Classes.TEXT_MUTED}>Cancelled At</dt>
-          <dd>{new Date(span.cancelledAt).toLocaleString()}</dd>
+          <dd>{endedAt}</dd>
         </>
       );
     }
   }, [span, span.state]);
 
   const duration = React.useMemo(() => {
-    const finish =
-      span.state === 'resolved'
-        ? span.resolvedAt
-        : span.state === 'rejected'
-        ? span.rejectedAt
-        : span.state === 'cancelled'
-        ? span.cancelledAt
-        : Date.now();
-
-    return finish - span.createdAt;
+    return ('endedAt' in span ? span.endedAt : Date.now()) - span.createdAt;
   }, [span, span.state]);
 
   return (

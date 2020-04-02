@@ -31,9 +31,7 @@ export const IOTab: React.FC<Props> = ({ span }) => {
       );
     }
 
-    const data = span.state === 'resolved' ? span.value : span.reason;
-
-    return <ObjectInspector data={data} theme={theme} />;
+    return <ObjectInspector data={span.output} theme={theme} />;
   }, [span.state]);
 
   return (
