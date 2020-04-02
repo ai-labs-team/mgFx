@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.0...mgfx@0.5.1) (2020-04-02)
+
+
+### Bug Fixes
+
+* core: proper fluent types ([59b60ee](https://github.com/ai-labs-team/mgFx/commit/59b60ee))
+
+
+
+
+
 # [0.5.0](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.4.1...mgfx@0.5.0) (2020-04-01)
 
 
