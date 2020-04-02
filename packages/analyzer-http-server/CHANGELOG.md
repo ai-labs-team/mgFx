@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.4.6...@mgfx/analyzer-http-server@0.5.0) (2020-04-02)
+
+
+### Features
+
+* analyzer-http-server: support `distinct` operator ([74e145c](https://github.com/ai-labs-team/mgFx/commit/74e145c))
+* analyzer-http-server: support new Span format ([2f2fe4b](https://github.com/ai-labs-team/mgFx/commit/2f2fe4b))
+
+
+
+
+
 ## [0.4.6](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.4.5...@mgfx/analyzer-http-server@0.4.6) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/analyzer-http-server

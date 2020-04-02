@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer@0.4.6...@mgfx/analyzer@1.0.0) (2020-04-02)
+
+
+### Features
+
+* analyzer: add 'distinct' Span query parameter ([d7b675d](https://github.com/ai-labs-team/mgFx/commit/d7b675d))
+* analyzer: simplify Span structure ([9be79e6](https://github.com/ai-labs-team/mgFx/commit/9be79e6))
+
+
+### BREAKING CHANGES
+
+* Instead of having separate 'resolvedAt', 'rejectedAt' 'cancelledAt', 'value' and 'reason' properties', Spans now have 'endedAt', and 'output' properties.
+
+
+
+
+
 ## [0.4.6](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer@0.4.5...@mgfx/analyzer@0.4.6) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/analyzer

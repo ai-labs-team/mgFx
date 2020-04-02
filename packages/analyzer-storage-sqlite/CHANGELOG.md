@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@1.0.6...@mgfx/analyzer-storage-sqlite@2.0.0) (2020-04-02)
+
+
+### Features
+
+* analyzer-storage-sqlite: change Span storage format ([1e2946f](https://github.com/ai-labs-team/mgFx/commit/1e2946f))
+* analyzer-storage-sqlite: support `distinct` operator ([d596f3b](https://github.com/ai-labs-team/mgFx/commit/d596f3b))
+
+
+### BREAKING CHANGES
+
+* When upgrading to this version, all pre-existing Spans will be lost.
+
+
+
+
+
 ## [1.0.6](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@1.0.5...@mgfx/analyzer-storage-sqlite@1.0.6) (2020-04-02)
 
 **Note:** Version bump only for package @mgfx/analyzer-storage-sqlite
