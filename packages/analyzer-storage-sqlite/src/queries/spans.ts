@@ -42,6 +42,10 @@ export const buildQuery = (params: SpanParameters) =>
       query.orderBy(field, params.order.direction);
     }
 
+    if (params.distinct) {
+      query.groupBy(params.distinct === 'input' ? 'input_id' : 'output_id');
+    }
+
     if (params.scope?.id) {
       query = buildRecursiveQuery(query, params) as any;
     }

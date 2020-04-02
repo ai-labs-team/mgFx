@@ -1,10 +1,11 @@
+import { fluent } from 'mgfx/dist/utils/fluenture';
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { ioTs, t } from '@mgfx/validator-iots';
-import { chain, promise, resolve, FutureInstance, after } from 'fluture';
+import { promise, resolve, after, reject } from 'fluture';
 import { localConnector, define, implement } from 'mgfx';
 import { join } from 'path';
 import { unlink as _unlink } from 'fs';
-import { promisify, inspect } from 'util';
+import { promisify } from 'util';
 
 import { sqlite } from './index';
 
@@ -31,8 +32,8 @@ const sum = implement(
   }),
   (xs, { runChild }) =>
     xs.reduce(
-      (result, a) => result.pipe(chain(b => runChild(add([a, b])))),
-      resolve(0) as FutureInstance<any, number>
+      (result, a) => result.chain(b => runChild(add([a, b]))),
+      fluent<any, number>(resolve(0))
     )
 );
 
@@ -58,11 +59,21 @@ const avg = implement(
     output: ioTs(t.number)
   }),
   (xs, { runChild }) =>
-    runChild(sum(xs)).pipe(chain(sum => runChild(div([sum, xs.length]))))
+    runChild(sum(xs)).chain(sum => runChild(div([sum, xs.length])))
+);
+
+let shouldFail = false;
+const couldFail = implement(
+  define({
+    name: 'couldFail',
+    input: ioTs(t.void),
+    output: ioTs(t.void)
+  }),
+  () => (shouldFail ? reject('nope') : resolve(undefined))
 );
 
 const analyzer = makeAnalyzer({ storage: sqlite({ filename }) });
-connector.serveModule({ add, sum, div, avg });
+connector.serveModule({ add, sum, div, avg, couldFail });
 connector.use(analyzer.collector);
 
 const ctx = connector.createContext({ isTest: true });
@@ -79,13 +90,14 @@ const tryCleanup = async () => {
 
 beforeAll(async () => {
   await tryCleanup();
-  await ctx.run(avg([1, 2, 3])).pipe(promise);
-  try {
-    await ctx.run(div([1, 0])).pipe(promise);
-  } catch {}
 
-  // Artificial wait for async. analysis to finish
-  await after(1000)(undefined).pipe(promise);
+  await ctx
+    .run(avg([1, 2, 3]))
+    .chain(after(100))
+    .and(ctx.run(div([1, 0])).alt(resolve(undefined)))
+    // Artificial wait for async. analysis to finish
+    .chain(after(1000))
+    .promise();
 });
 
 afterAll(async () => {
@@ -211,5 +223,32 @@ describe('query.spans', () => {
       expect(span).not.toHaveProperty('output');
       expect(span.context).not.toHaveProperty('values');
     });
+  });
+
+  it('supports the `distinct` operator', async () => {
+    await connector
+      .run(couldFail())
+      .chain(after(100))
+      .promise();
+
+    shouldFail = true;
+    await connector
+      .run(couldFail())
+      .alt(resolve('ok'))
+      .chain(after(100))
+      .promise();
+
+    const spans = await analyzer.query
+      .spans({
+        scope: { spec: { name: 'couldFail' } },
+        order: { field: 'endedAt', direction: 'asc' },
+        compact: true,
+        distinct: 'input'
+      })
+      .get()
+      .pipe(promise);
+
+    expect(spans).toHaveLength(1);
+    expect(spans[0].state).toBe('rejected');
   });
 });
