@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.3...mgfx@0.6.0) (2020-04-03)
+
+
+### Features
+
+* core: expose Process on `environment` ([b86491e](https://github.com/ai-labs-team/mgFx/commit/b86491e))
+
+
+
+
+
 ## [0.5.3](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.2...mgfx@0.5.3) (2020-04-02)
 
 

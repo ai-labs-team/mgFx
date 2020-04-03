@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.11](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.10...@mgfx/analyzer-gui@1.2.11) (2020-04-03)
+
+**Note:** Version bump only for package @mgfx/analyzer-gui
+
+
+
+
+
 ## [1.2.10](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.9...@mgfx/analyzer-gui@1.2.10) (2020-04-02)
 
 
