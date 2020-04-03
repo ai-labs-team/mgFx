@@ -45,6 +45,7 @@ export type EncasedImplementationFunction<S extends Spec = Spec> = (
 export type Environment<S extends Spec = Spec> = {
   runChild: RunFn;
   context: ContextOf<S>;
+  process: Omit<Process, 'input' | 'spec' | 'context'>;
 };
 
 /**
@@ -53,7 +54,7 @@ export type Environment<S extends Spec = Spec> = {
  * implementations.
  */
 export type EnvironmentInitializer<S extends Spec = Spec> = (
-  process: Pick<Process, 'id' | 'context'>
+  process: Pick<Process, 'id' | 'context' | 'input'>
 ) => Environment<S>;
 
 /**
@@ -134,20 +135,26 @@ export const encaseImplementation = <S extends Spec>(
 export const makeConnector = (config: Config): Connector => {
   const middleware = makeContainer();
 
-  const environmentInitializer: EnvironmentInitializer = parentProcess => ({
-    runChild: process =>
-      process
-        .pipe(
-          map(childProcess => ({
-            ...childProcess,
-            parentId: parentProcess.id,
-            context: parentProcess.context
-          }))
-        )
-        .pipe(self.run),
+  const environmentInitializer: EnvironmentInitializer = process => {
+    const { input, context, ...rest } = process;
 
-    context: parentProcess.context ? parentProcess.context.values : {}
-  });
+    return {
+      process: rest,
+
+      context: context ? context.values : {},
+
+      runChild: child =>
+        child
+          .pipe(
+            map(childProcess => ({
+              ...childProcess,
+              parentId: process.id,
+              context
+            }))
+          )
+          .pipe(self.run)
+    };
+  };
 
   const self: Connector = {
     use: middleware.use,

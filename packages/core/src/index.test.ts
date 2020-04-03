@@ -5,7 +5,8 @@ import {
   reject,
   rejectAfter,
   chain,
-  go
+  go,
+  map
 } from 'fluture';
 
 import { localConnector, define, implement, fork } from './index';
@@ -133,6 +134,32 @@ describe('validation', () => {
     } catch (err) {
       expect(err.errors).toBe('Invalid data: Hello World!');
     }
+  });
+
+  it('passes the current Process to Tasks', async () => {
+    expect.assertions(1);
+
+    const checkProcess = implement(
+      define({
+        name: 'checkProcess',
+        input: validateVoid,
+        output: validateVoid
+      }),
+      (input, environment) => {
+        expect((environment.process as any).isTest).toBe(true);
+      }
+    );
+
+    await withImplementation(checkProcess)(() => {
+      return mgFx.run(
+        checkProcess().pipe(
+          map(process => ({
+            ...process,
+            isTest: true
+          }))
+        )
+      );
+    }).pipe(promise);
   });
 });
 
