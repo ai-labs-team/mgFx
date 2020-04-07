@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.1](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@2.2.0...@mgfx/analyzer-storage-sqlite@2.2.1) (2020-04-07)
+
+
+### Bug Fixes
+
+* analyzer-storage-sqlite: add mgfx as dependency ([e745390](https://github.com/ai-labs-team/mgFx/commit/e745390))
+
+
+
+
+
 # [2.2.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@2.1.2...@mgfx/analyzer-storage-sqlite@2.2.0) (2020-04-07)
 
 
