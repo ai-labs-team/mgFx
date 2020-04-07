@@ -4,6 +4,7 @@ import { titleCase } from 'title-case';
 import { Tag, Classes } from '@blueprintjs/core';
 
 import { stateIntent, stateIcon } from '../../common';
+import { SpanLink } from './SpanLink';
 
 type Props = {
   span: Span;
@@ -49,6 +50,19 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
     return ('endedAt' in span ? span.endedAt : Date.now()) - span.createdAt;
   }, [span, span.state]);
 
+  const parent = React.useMemo(() => {
+    if (span.parentId) {
+      return (
+        <>
+          <dt className={Classes.TEXT_MUTED}>Parent Task</dt>
+          <dd>
+            <SpanLink id={span.parentId} />
+          </dd>
+        </>
+      );
+    }
+  }, [span.parentId]);
+
   return (
     <dl className="summary-tab">
       <dt className={Classes.TEXT_MUTED}>Task Name</dt>
@@ -71,6 +85,7 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
       {finishedAt}
       <dt className={Classes.TEXT_MUTED}>Duration</dt>
       <dd>{duration.toLocaleString()} ms</dd>
+      {parent}
     </dl>
   );
 };

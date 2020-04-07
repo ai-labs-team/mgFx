@@ -32,6 +32,14 @@
         margin: 1px;
         cursor: pointer;
         transition: opacity 0.1s ease;
+
+        .name {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          direction: rtl;
+          text-align: left;
+        }
       }
 
       .children {

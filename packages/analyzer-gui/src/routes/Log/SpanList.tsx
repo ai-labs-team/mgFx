@@ -28,7 +28,7 @@ type ItemProps = {
 const Item: React.FC<ItemProps> = ({
   data: { layout, onSelect, selectedId },
   index,
-  style
+  style,
 }) => {
   const [depth, span] = layout[index];
 
@@ -39,14 +39,16 @@ const Item: React.FC<ItemProps> = ({
         left: (style.left as number) + 20 * depth,
         right: 0,
         height: (style.height as number) - 1,
-        width: 'auto'
+        width: 'auto',
       }}
       className={classNames('item', { selected: selectedId === span.id })}
       intent={stateIntent(span)}
       icon={stateIcon({ span, size: 20 })}
       onClick={() => onSelect(span.id)}
     >
-      <H4 className={Classes.MONOSPACE_TEXT}>{span.process.spec.name}</H4>
+      <H4 className={classNames('name', Classes.MONOSPACE_TEXT)}>
+        {span.process.spec.name}
+      </H4>
     </Callout>
   );
 };
@@ -56,7 +58,7 @@ export const SpanList: React.FC<Props> = ({ spans, selectedId, onSelect }) => {
 
   const layout = React.useMemo(() => computeLayout(displayMode, spans), [
     displayMode,
-    spans
+    spans,
   ]);
 
   if (!spans.length) {
@@ -117,11 +119,11 @@ const computeLayout = (
   spans: Span[]
 ): Layout => {
   if (displayMode === 'list') {
-    return spans.map(span => [0, span]);
+    return spans.map((span) => [0, span]);
   }
 
   const roots = spans.filter(
-    span => !span.parentId || !spans.find(isParentOf(span))
+    (span) => !span.parentId || !spans.find(isParentOf(span))
   );
 
   return computeTreeLayout(spans, roots);

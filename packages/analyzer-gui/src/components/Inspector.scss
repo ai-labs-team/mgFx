@@ -47,18 +47,33 @@
       line-height: $pt-line-height * 2;
     }
 
-    .bp3-tag {
-      vertical-align: middle;
+    dt {
+      white-space: nowrap;
     }
 
     dd {
       margin-left: 0;
+      overflow-y: hidden;
+    }
+
+    .bp3-tag {
+      vertical-align: middle;
     }
   }
 
   li[role='treeitem'] {
     .bp3-dark & {
       background-color: $pt-dark-app-background-color !important;
+    }
+  }
+
+  .span-link {
+    .content {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      direction: rtl;
+      text-align: left;
     }
   }
 }
