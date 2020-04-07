@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.14](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-client@0.3.13...@mgfx/analyzer-http-client@0.3.14) (2020-04-07)
+
+**Note:** Version bump only for package @mgfx/analyzer-http-client
+
+
+
+
+
 ## [0.3.13](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-client@0.3.12...@mgfx/analyzer-http-client@0.3.13) (2020-04-03)
 
 **Note:** Version bump only for package @mgfx/analyzer-http-client

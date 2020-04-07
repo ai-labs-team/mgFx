@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@2.1.2...@mgfx/analyzer-storage-sqlite@2.2.0) (2020-04-07)
+
+
+### Features
+
+* analyzer: add `buffer` mode for better throughput ([41a6564](https://github.com/ai-labs-team/mgFx/commit/41a6564))
+
+
+
+
+
 ## [2.1.2](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-sqlite@2.1.1...@mgfx/analyzer-storage-sqlite@2.1.2) (2020-04-03)
 
 **Note:** Version bump only for package @mgfx/analyzer-storage-sqlite
