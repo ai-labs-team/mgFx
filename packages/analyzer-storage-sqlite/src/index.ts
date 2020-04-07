@@ -1,77 +1,134 @@
-import { Event } from 'mgfx/dist/middleware/instrumenter';
-import { Initializer } from '@mgfx/analyzer/dist/storage';
-import { attemptP, chain, encaseP, map } from 'fluture';
+import {
+  Event,
+  ProcessEvent,
+  RejectionEvent,
+  ResolutionEvent,
+  CancellationEvent,
+} from 'mgfx/dist/middleware/instrumenter';
+import { fluent } from 'mgfx/dist/utils/fluenture';
+import { Initializer, Storage } from '@mgfx/analyzer/dist/storage';
+import { resolve } from 'fluture';
 import { join } from 'path';
-import { open, Database } from 'sqlite';
-import { QueryBuilder } from 'knex';
+import DB from 'better-sqlite3-helper';
+import { Database } from 'better-sqlite3';
 
-import { bind } from './statements';
+import * as statements from './statements';
 import * as spans from './queries/spans';
+import { all, switchEvent, encodeEvent } from './utils';
 
 export type Config = {
   filename: string;
-  forceMigrations: string;
+  forceMigrations?: 'last' | false;
 };
 
-type MigrateOptions = Parameters<Database['migrate']>[0];
+export const sqlite: Initializer<Partial<Config>> = (config) => {
+  const {
+    filename = join('.', 'mgfx-analyzer.sqlite'),
+    forceMigrations,
+  } = config;
 
-const migrate = (options: MigrateOptions) =>
-  encaseP((db: Database) => db.migrate(options));
+  // @ts-ignore
+  const db: Database = new DB({
+    path: filename,
+    migrate: {
+      force: forceMigrations,
+      table: 'migrations',
+      migrationsPath: join(__dirname, 'migrations'),
+    },
+  });
 
-export const sqlite: Initializer<Partial<Config>> = config => {
-  const { filename = join('.', 'mgfx-analyzer.sqlite') } = config;
+  db.pragma('foreign_keys = OFF');
 
-  return attemptP(() => open(filename))
-    .pipe(
-      chain(
-        migrate({
-          force: config.forceMigrations,
-          migrationsPath: join(__dirname, 'migrations')
-        })
-      )
-    )
-    .pipe(
-      chain(db => {
-        const runQuery = encaseP((query: QueryBuilder) => {
-          const { sql, bindings } = query.toSQL();
-          return db.all(sql, bindings);
-        });
+  const cacheValue = db.prepare(statements.cacheValue);
+  const updateSpan = db.prepare(statements.updateSpan);
+  const putEventProcess = db.prepare(statements.putEventProcess);
+  const putEventRejection = db.prepare(statements.putEventRejection);
+  const putEventResolution = db.prepare(statements.putEventResolution);
+  const putEventCancellation = db.prepare(statements.putEventCancellation);
 
-        db.run('PRAGMA synchronous = NORMAL');
-        db.run('PRAGMA journal_mode = WAL');
+  const putEvent = switchEvent<void, any>({
+    process: db.transaction((event: ProcessEvent, [input, context]) => {
+      cacheValue.run(input);
+      cacheValue.run(context);
 
-        return bind(db).pipe(
-          map(boundStatements => ({
-            put: {
-              event: (event: Event) => {
-                if (event.kind === 'process') {
-                  return boundStatements.putEventProcess(event);
-                }
+      putEventProcess.run({
+        input,
+        context,
+        timestamp: event.timestamp,
+        processSpecName: event.process.spec.name,
+        processId: event.process.id,
+        processParentId: event.process.parentId,
+        contextId: event.process.context?.id ?? undefined,
+        contextParentId: event.process.context?.parentId ?? undefined,
+      });
 
-                if (event.kind === 'resolution') {
-                  return boundStatements.putEventResolution(event);
-                }
+      updateSpan.run(event.process.id);
+    }),
 
-                if (event.kind === 'rejection') {
-                  return boundStatements.putEventRejection(event);
-                }
+    rejection: db.transaction((event: RejectionEvent, reason) => {
+      cacheValue.run(reason);
+      putEventRejection.run({
+        reason,
+        timestamp: event.timestamp,
+        id: event.id,
+      });
+      updateSpan.run(event.id);
+    }),
 
-                if (event.kind === 'cancellation') {
-                  return boundStatements.putEventCancellation(event);
-                }
+    resolution: db.transaction((event: ResolutionEvent, value) => {
+      cacheValue.run(value);
+      putEventResolution.run({
+        value,
+        timestamp: event.timestamp,
+        id: event.id,
+      });
+      updateSpan.run(event.id);
+    }),
 
-                throw new Error('Unable to store event');
-              }
-            },
-            query: {
-              spans: params =>
-                spans
-                  .buildQuery(params)
-                  .pipe(chain(runQuery))
-                  .pipe(chain(spans.formatResult(params)))
-            }
-          }))
-        );
-      })
-    );
+    cancellation: db.transaction((event: CancellationEvent) => {
+      putEventCancellation.run({
+        timestamp: event.timestamp,
+        id: event.id,
+      });
+      updateSpan.run(event.id);
+    }),
+  });
+
+  const putEvents = db.transaction((events: Event[], encodedValues: any[]) => {
+    events.forEach((event, index) => {
+      const values = encodedValues[index];
+      putEvent(event, values);
+    });
+  });
+
+  const self: Storage = {
+    put: {
+      event: (event) =>
+        encodeEvent(event)
+          .pipe(fluent)
+          .map((values) => {
+            putEvent(event, values);
+          }),
+
+      events: (events) =>
+        all(events.map((event) => encodeEvent(event)))
+          .pipe(fluent)
+          .map((eventValues) => {
+            putEvents(events, eventValues);
+          }),
+    },
+    query: {
+      spans: (params) =>
+        spans
+          .buildQuery(params)
+          .pipe(fluent)
+          .map((query) => {
+            const { sql, bindings } = query.toSQL();
+            return db.prepare(sql).all(bindings);
+          })
+          .chain(spans.formatResult(params)),
+    },
+  };
+
+  return resolve(self);
 };

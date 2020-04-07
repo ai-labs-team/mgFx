@@ -12,6 +12,7 @@ import { SpanParameters, Span } from './query';
 export type Storage = {
   put: {
     event: (event: Event) => FutureInstance<any, any>;
+    events?: (events: Event[]) => FutureInstance<any, any>;
   };
   query: {
     spans: (params: SpanParameters) => FutureInstance<any, Span[]>;

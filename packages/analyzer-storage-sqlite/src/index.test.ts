@@ -11,7 +11,7 @@ import { sqlite } from './index';
 
 const unlink = promisify(_unlink);
 
-const filename = join(__dirname, 'mgfx-analyzer.sql');
+const filename = join(__dirname, 'mgfx-analyzer.sqlite');
 
 const connector = localConnector();
 
@@ -19,7 +19,7 @@ const add = implement(
   define({
     name: 'add',
     input: ioTs(t.tuple([t.number, t.number])),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   ([a, b]) => after(10)(a + b)
 );
@@ -28,11 +28,11 @@ const sum = implement(
   define({
     name: 'sum',
     input: ioTs(t.array(t.number)),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   (xs, { runChild }) =>
     xs.reduce(
-      (result, a) => result.chain(b => runChild(add([a, b]))),
+      (result, a) => result.chain((b) => runChild(add([a, b]))),
       fluent<any, number>(resolve(0))
     )
 );
@@ -41,7 +41,7 @@ const div = implement(
   define({
     name: 'div',
     input: ioTs(t.tuple([t.number, t.number])),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   ([a, b]) => {
     if (b === 0) {
@@ -56,10 +56,10 @@ const avg = implement(
   define({
     name: 'avg',
     input: ioTs(t.array(t.number)),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   (xs, { runChild }) =>
-    runChild(sum(xs)).chain(sum => runChild(div([sum, xs.length])))
+    runChild(sum(xs)).chain((sum) => runChild(div([sum, xs.length])))
 );
 
 let shouldFail = false;
@@ -67,9 +67,9 @@ const couldFail = implement(
   define({
     name: 'couldFail',
     input: ioTs(t.any),
-    output: ioTs(t.any)
+    output: ioTs(t.any),
   }),
-  val => (shouldFail ? reject('nope') : val)
+  (val) => (shouldFail ? reject('nope') : val)
 );
 
 const analyzer = makeAnalyzer({ storage: sqlite({ filename }) });
@@ -95,8 +95,6 @@ beforeAll(async () => {
     .run(avg([1, 2, 3]))
     .chain(after(100))
     .and(ctx.run(div([1, 0])).alt(resolve(undefined)))
-    // Artificial wait for async. analysis to finish
-    .chain(after(1000))
     .promise();
 });
 
@@ -106,10 +104,7 @@ afterAll(async () => {
 
 describe('query.spans', () => {
   it('selects all spans', async () => {
-    const spans = await analyzer.query
-      .spans({})
-      .get()
-      .pipe(promise);
+    const spans = await analyzer.query.spans({}).get().pipe(promise);
 
     expect(spans).toHaveLength(7);
   });
@@ -121,16 +116,15 @@ describe('query.spans', () => {
     await ctxA
       .run(add([1, 1]))
       .and(ctxB.run(add([2, 2])))
-      .chain(after(100))
       .promise();
 
     const spansA = await analyzer.query
       .spans({
         scope: {
           context: {
-            id: ctxA.id
-          }
-        }
+            id: ctxA.id,
+          },
+        },
       })
       .get()
       .pipe(promise);
@@ -139,9 +133,9 @@ describe('query.spans', () => {
       .spans({
         scope: {
           context: {
-            id: ctxB.id
-          }
-        }
+            id: ctxB.id,
+          },
+        },
       })
       .get()
       .pipe(promise);
@@ -158,9 +152,9 @@ describe('query.spans', () => {
       .spans({
         scope: {
           spec: {
-            name: 'div'
-          }
-        }
+            name: 'div',
+          },
+        },
       })
       .get()
       .pipe(promise);
@@ -173,9 +167,9 @@ describe('query.spans', () => {
       .spans({
         scope: {
           input: {
-            eq: [6, 3]
-          }
-        }
+            eq: [6, 3],
+          },
+        },
       })
       .get()
       .pipe(promise);
@@ -190,8 +184,8 @@ describe('query.spans', () => {
     const spans = await analyzer.query
       .spans({
         scope: {
-          state: 'rejected'
-        }
+          state: 'rejected',
+        },
       })
       .get()
       .pipe(promise);
@@ -205,15 +199,15 @@ describe('query.spans', () => {
       .spans({
         scope: {
           spec: {
-            name: 'add'
-          }
+            name: 'add',
+          },
         },
         order: {
           field: 'createdAt',
-          direction: 'asc'
+          direction: 'asc',
         },
         limit: 2,
-        offset: 1
+        offset: 1,
       })
       .get()
       .pipe(promise);
@@ -225,7 +219,7 @@ describe('query.spans', () => {
   it('selects all spans that descend from `id`', async () => {
     const [{ id }] = await analyzer.query
       .spans({
-        scope: { spec: { name: 'avg' } }
+        scope: { spec: { name: 'avg' } },
       })
       .get()
       .pipe(promise);
@@ -244,7 +238,7 @@ describe('query.spans', () => {
       .get()
       .pipe(promise);
 
-    spans.forEach(span => {
+    spans.forEach((span) => {
       expect(span).not.toHaveProperty('input');
       expect(span).not.toHaveProperty('output');
       expect(span.context).not.toHaveProperty('values');
@@ -257,7 +251,7 @@ describe('query.spans', () => {
       .get()
       .pipe(promise);
 
-    spans.forEach(span => {
+    spans.forEach((span) => {
       expect(span).not.toHaveProperty('input');
       expect(span).not.toHaveProperty('output');
       expect(span.context).not.toHaveProperty('values');
@@ -266,24 +260,17 @@ describe('query.spans', () => {
 
   describe('distinct operator', () => {
     it('supports `input`', async () => {
-      await connector
-        .run(couldFail(0))
-        .chain(after(10))
-        .promise();
+      await connector.run(couldFail(0)).promise();
 
       shouldFail = true;
-      await connector
-        .run(couldFail(0))
-        .alt(resolve('ok'))
-        .chain(after(10))
-        .promise();
+      await connector.run(couldFail(0)).alt(resolve('ok')).promise();
 
       const spans = await analyzer.query
         .spans({
           scope: { spec: { name: 'couldFail' } },
           order: { field: 'endedAt', direction: 'asc' },
           compact: true,
-          distinct: 'input'
+          distinct: 'input',
         })
         .get()
         .pipe(promise);
@@ -297,16 +284,14 @@ describe('query.spans', () => {
 
       await ctx
         .run(add([1, 0]))
-        .chain(after(10))
         .and(ctx.run(add([0, 1])))
-        .chain(after(10))
         .promise();
 
       const spans = await analyzer.query
         .spans({
           scope: { spec: { name: 'add' }, context: { id: ctx.id } },
           order: { field: 'endedAt', direction: 'asc' },
-          distinct: 'output'
+          distinct: 'output',
         })
         .get()
         .pipe(promise);
@@ -320,7 +305,6 @@ describe('query.spans', () => {
 
       await ctx
         .run(div([2, 1]))
-        .chain(after(10))
         .and(ctx.run(div([1, 1])))
         .chain(after(10))
         .and(ctx.run(div([1, 0])))
@@ -334,9 +318,9 @@ describe('query.spans', () => {
           order: { field: 'endedAt', direction: 'asc' },
           distinct: {
             input: {
-              path: ['$.v[0]']
-            }
-          }
+              path: ['$.v[0]'],
+            },
+          },
         })
         .get()
         .pipe(promise);
@@ -349,4 +333,35 @@ describe('query.spans', () => {
       expect(spans[1].state).toBe('rejected');
     });
   });
+});
+
+it('supports writing events in buffered mode', (done) => {
+  const bufferedAnalyzer = makeAnalyzer({
+    storage: sqlite({ filename }),
+    buffer: { enabled: true },
+  });
+  const bufferedConnector = localConnector();
+  bufferedConnector.use(bufferedAnalyzer.collector);
+  bufferedConnector.serveModule({ add });
+
+  let updateCount = 0;
+  bufferedAnalyzer.query
+    .spans({})
+    .watch()
+    .observe((spans) => {
+      updateCount += 1;
+      if (spans.length === 0) {
+        return;
+      }
+
+      expect(updateCount).toBe(2);
+      done();
+    });
+
+  bufferedConnector
+    .run(add([1, 2]))
+    .and(bufferedConnector.run(add([3, 4])))
+    .and(bufferedConnector.run(add([5, 6])))
+    .and(bufferedConnector.run(add([7, 8])))
+    .promise();
 });
