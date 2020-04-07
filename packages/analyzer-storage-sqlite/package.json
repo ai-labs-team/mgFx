@@ -30,6 +30,7 @@
     "better-sqlite3": "^6.0.1",
     "better-sqlite3-helper": "^2.3.0",
     "knex": "^0.20.10",
+    "mgfx": "^0.6.0",
     "sql-template-strings": "^2.2.2"
   },
   "jest": {
