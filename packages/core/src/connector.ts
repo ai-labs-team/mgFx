@@ -9,7 +9,7 @@
  * The 'base' connector implementation is an abstraction; specific a specific concrete implementation must be used to
  * provide the transport between `exec` and `provide`.
  */
-import { FutureInstance, attempt, chain, map, parallel } from 'fluture';
+import { FutureInstance, attempt, chain, map, both, and } from 'fluture';
 
 import {
   ContextOf,
@@ -18,10 +18,15 @@ import {
   OutputOf,
   Spec,
   Implementation,
-  ImplementationFunction
+  ImplementationFunction,
 } from './task';
+
 import { Context, Values, makeContext } from './context';
-import { UseFn, makeContainer } from './middleware';
+import {
+  UseFn,
+  MiddlewareFn as BaseMiddlewareFn,
+  makeContainer,
+} from './middleware';
 import { validateContext, validateInput, validateOutput } from './validator';
 import { toFuture } from './utils';
 import { fluent, Fluent } from './utils/fluenture';
@@ -94,7 +99,7 @@ export type Connector = {
   serve: ServeFn;
   serveModule: (module: ImplementationModule) => () => void;
   run: RunFn;
-  use: UseFn;
+  use: UseFn<Process, FutureInstance<any, any>>;
   createContext: (values?: Values) => Context;
 };
 
@@ -129,13 +134,16 @@ export const encaseImplementation = <S extends Spec>(
   attempt(() => implementation(input, environment)).pipe(chain(toFuture));
 
 /**
+ * A convenience type alias for the Middleware functions accepted by `connector.use`
+ */
+export type MiddlewareFn = BaseMiddlewareFn<Process, FutureInstance<any, any>>;
+
+/**
  * Creates a Connector; typically end-users would not call this directly, and would instead rely on a specific
  * Connector implementation that calls this implicitly.
  */
 export const makeConnector = (config: Config): Connector => {
-  const middleware = makeContainer();
-
-  const environmentInitializer: EnvironmentInitializer = process => {
+  const environmentInitializer: EnvironmentInitializer = (process) => {
     const { input, context, ...rest } = process;
 
     return {
@@ -143,39 +151,31 @@ export const makeConnector = (config: Config): Connector => {
 
       context: context ? context.values : {},
 
-      runChild: child =>
+      runChild: (child) =>
         child
           .pipe(
-            map(childProcess => ({
+            map((childProcess) => ({
               ...childProcess,
               parentId: process.id,
-              context
+              context,
             }))
           )
-          .pipe(self.run)
+          .pipe(self.run),
     };
   };
+
+  const middleware = makeContainer((process: Process) =>
+    both(validateInput(process.spec.input, process.input))(
+      validateContext(process.spec.context, process.context)
+    )
+      .pipe(and(config.dispatch(process)))
+      .pipe(chain((output) => validateOutput(process.spec.output, output)))
+  );
 
   const self: Connector = {
     use: middleware.use,
 
-    run: process =>
-      middleware.apply
-        .pre(process)
-        .pipe(
-          chain(process =>
-            parallel(Infinity)([
-              validateInput(process.spec.input, process.input),
-              validateContext(process.spec.context, process.context)
-            ])
-              .pipe(chain(_ => config.dispatch(process)))
-              .pipe(
-                chain(output => validateOutput(process.spec.output, output))
-              )
-              .pipe(future => middleware.apply.post(future, process))
-          )
-        )
-        .pipe(fluent),
+    run: (process) => process.pipe(chain(middleware.apply)).pipe(fluent),
 
     serve: ({ spec, implementation }) =>
       config.provide(
@@ -184,18 +184,18 @@ export const makeConnector = (config: Config): Connector => {
         environmentInitializer
       ),
 
-    serveModule: module => {
-      const cancelFns = Object.keys(module).map(name => {
+    serveModule: (module) => {
+      const cancelFns = Object.keys(module).map((name) => {
         const implementation = module[name];
         return self.serve(implementation);
       });
 
       return () => {
-        cancelFns.forEach(cancelFn => cancelFn());
+        cancelFns.forEach((cancelFn) => cancelFn());
       };
     },
 
-    createContext: values => makeContext(self.run, undefined, values)
+    createContext: (values) => makeContext(self.run, undefined, values),
   };
 
   return self;

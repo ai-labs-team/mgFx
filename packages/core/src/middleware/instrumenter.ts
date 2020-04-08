@@ -2,10 +2,10 @@
  * A specialized application of Middleware that can observe the progression and settlement of Task executions, intended
  * for a way of analyzing the run-time behaviour of mgFx-powered applications.
  */
-import { map, bimap } from 'fluture';
+import { map, bimap, FutureInstance } from 'fluture';
 
 import { Process, Spec } from '../task';
-import { Bundle } from '../middleware';
+import { MiddlewareFn } from '../middleware';
 import { tapCancellation } from '../utils';
 
 /**
@@ -61,52 +61,49 @@ const tap = <T>(fn: (value: T) => any) => (value: T) => {
 };
 
 /**
- * Creates a Middleware bundle that:
+ * Creates a Middleware function that:
  * - Emits `process` Events *before* a Process begins execution.
  * - Emits `rejection` or `resolutions` Events *after* a Process has completed (successfully or unsuccessfully).
  * - Emits `cancellation` Events whenever a Process was cancelled.
  */
-export const makeInstrumenter = (config: Config): Bundle => ({
-  pre: map(
-    tap(process => {
-      config.receiver({
-        kind: 'process',
-        timestamp: timestamp(),
-        process
-      });
-    })
-  ),
+export const makeInstrumenter = (
+  config: Config
+): MiddlewareFn<Process, FutureInstance<any, any>> => (process, next) => {
+  config.receiver({
+    kind: 'process',
+    timestamp: timestamp(),
+    process,
+  });
 
-  post: (future, process) =>
-    future
-      .pipe(
-        bimap(
-          tap(reason => {
-            config.receiver({
-              kind: 'rejection',
-              timestamp: timestamp(),
-              id: process.id,
-              reason
-            });
-          })
-        )(
-          tap(value => {
-            config.receiver({
-              kind: 'resolution',
-              timestamp: timestamp(),
-              id: process.id,
-              value
-            });
-          })
-        )
-      )
-      .pipe(
-        tapCancellation(() => {
+  return next(process)
+    .pipe(
+      bimap(
+        tap((reason) => {
           config.receiver({
-            kind: 'cancellation',
+            kind: 'rejection',
             timestamp: timestamp(),
-            id: process.id
+            id: process.id,
+            reason,
+          });
+        })
+      )(
+        tap((value) => {
+          config.receiver({
+            kind: 'resolution',
+            timestamp: timestamp(),
+            id: process.id,
+            value,
           });
         })
       )
-});
+    )
+    .pipe(
+      tapCancellation(() => {
+        config.receiver({
+          kind: 'cancellation',
+          timestamp: timestamp(),
+          id: process.id,
+        });
+      })
+    );
+};

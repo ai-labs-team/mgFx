@@ -1,7 +1,7 @@
 import { deepEqual } from 'fast-equals';
 import { Emitter, Stream, stream as _stream } from 'kefir';
+import { MiddlewareFn } from 'mgfx/dist/connector';
 import { makeInstrumenter, Event } from 'mgfx/dist/middleware/instrumenter';
-import { Bundle } from 'mgfx/dist/middleware';
 import { fluent } from 'mgfx/dist/utils/fluenture';
 import { fork } from 'mgfx';
 import {
@@ -30,7 +30,7 @@ export type Receiver = (event: Event) => void;
 
 export type Analyzer = {
   receiver: Receiver;
-  collector: Bundle;
+  collector: MiddlewareFn;
   query: {
     spans: Interface<SpanParameters, Span[]>;
   };

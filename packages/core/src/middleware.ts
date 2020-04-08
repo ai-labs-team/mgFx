@@ -1,75 +1,73 @@
 /**
- * 'middleware' allows users to observe and influnce mgFx's runtime behaviour.
+ * A function that can be added via a Middleware Container's `use` function.
+ * `previous` will be the value that passed from the previous Middleware function in the 'stack'.
+ * `next` is a reference to the next Middleware function in the 'stack'.
+ *
+ * @example
+ * // No-op
+ * container.use((x, next) => next(x))
+ *
+ * @example
+ * // Tap input/output
+ * container.use((x, next) => {
+ *   console.log('input', x);
+ *   const result = next(x);
+ *   console.log('output', result);
+ *   return result
+ * })
+ *
+ * @example
+ * // Mutate input
+ * container.use((x, next) => next({
+ *   ...x,
+ *   extraProp: true
+ * }))
+ *
+ * @example
+ * // Mutate output
+ * container.use((x, next) => ({
+ *   ...next(x),
+ *   extraProp: true
+ * }))
+ *
+ * @example
+ * // Short-circuit/Branching
+ * container.use((x, next) => x.authenticated ? next(x) : 'Access Denied')
  */
-import { FutureInstance } from 'fluture';
-
-import { Process } from './task';
+export type MiddlewareFn<T, U> = (previous: T, next: NextFn<T, U>) => U;
 
 /**
- * 'Pre' middleware functions are applied to Process objects, and can be used to observe (and modify, if required) them
- * before they are passed to a Connector's `run` function.
+ * A reference to the 'next' function in the Middleware stack.
  */
-export type PreFn = (
-  process: FutureInstance<any, Process>
-) => FutureInstance<any, Process>;
+export type NextFn<T, U> = (value: T) => U;
 
 /**
- * 'Post' middleware functions are applied at the end of a Task's execution, and can be used to observe (and modify, if
- * required) the final outcome of a Task's execution, before that information is sent back to the original caller.
+ * Used to 'add' another function to the Middleware stack.
  */
-export type PostFn = (
-  future: FutureInstance<any, any>,
-  process: Process
-) => FutureInstance<any, any>;
-
-/**
- * A 'bundle' object encapsulates one or many 'pre' and 'post' functions, to be consumed by the `use` function.
- */
-export type Bundle = Partial<{
-  pre: PreFn | PreFn[];
-  post: PostFn | PostFn[];
-}>;
-
-export type UseFn = (bundle: Bundle) => void;
+export type UseFn<T, U> = (middleware: MiddlewareFn<T, U>) => void;
 
 /**
  * A Middleware container provides an encapsulation for Middleware functions to be 'registered' via `use`, and then
- * applied when required via `apply.*`.
+ * applied when required via `apply`.
  */
-export type Container = {
-  use: UseFn;
-  apply: {
-    pre: PreFn;
-    post: PostFn;
-  };
+export type Container<T, U> = {
+  use: UseFn<T, U>;
+  apply: NextFn<T, U>;
 };
 
 /**
- * Creates a Middleware Container; this is typically called internally by a Connector when it is being made.
+ * Creates a Middleware container. Requires an initial implementation function via `initial`. New Middleware functions
+ * may be added via `use`, and the result of calling the entire stack via `apply`.
  */
-export const makeContainer = (): Container => {
-  const registered = {
-    pre: [] as PreFn[],
-    post: [] as PostFn[]
-  };
+export const makeContainer = <T, U>(initial: NextFn<T, U>): Container<T, U> => {
+  let stack = initial;
 
   return {
-    use: bundle => {
-      if (bundle.pre) {
-        registered.pre = registered.pre.concat(bundle.pre);
-      }
-
-      if (bundle.post) {
-        registered.post = registered.post.concat(bundle.post);
-      }
+    use: (middleware) => {
+      const next = stack;
+      stack = (value) => middleware(value, next);
     },
 
-    apply: {
-      pre: process =>
-        registered.pre.reduce((result, next) => next(result), process),
-
-      post: (future, process) =>
-        registered.post.reduce((result, next) => next(result, process), future)
-    }
+    apply: (value) => stack(value),
   };
 };

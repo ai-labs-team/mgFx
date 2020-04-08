@@ -6,7 +6,7 @@ import {
   rejectAfter,
   chain,
   go,
-  map
+  map,
 } from 'fluture';
 
 import { localConnector, define, implement, fork } from './index';
@@ -77,17 +77,37 @@ describe('run()', () => {
   it('handles asynchronous Task failure', async () => {
     const asyncFail = implement(
       define({ name: 'syncFail', input: validateVoid, output: validateVoid }),
-      _ => rejectAfter(100)(new Error('oops!'))
+      (_) => rejectAfter(100)(new Error('oops!'))
     );
 
     expect.assertions(1);
     try {
-      await withImplementation(asyncFail)(_ => mgFx.run(asyncFail())).pipe(
+      await withImplementation(asyncFail)((_) => mgFx.run(asyncFail())).pipe(
         promise
       );
     } catch (err) {
       expect(err.message).toBe('oops!');
     }
+  });
+
+  it('returns a fluent interface', async () => {
+    const syncGreet = implement(
+      define({
+        name: 'syncGreet',
+        input: validateString,
+        output: validateString,
+      }),
+      (name) => `Hello ${name}!`
+    );
+
+    const result = await withImplementation(syncGreet)((_) =>
+      mgFx
+        .run(syncGreet('World'))
+        .map((str) => str.length)
+        .map((x) => x + 1)
+    ).pipe(promise);
+
+    expect(result).toBe(13);
   });
 });
 
@@ -264,18 +284,36 @@ const average = implement(
   define({
     name: 'average',
     input: validateAny,
-    output: validateAny
+    output: validateAny,
   }),
   (xs: number[], environment) =>
     environment
       .runChild(sum(xs))
-      .pipe(chain(sum => environment.runChild(div([sum, xs.length]))))
+      .pipe(chain((sum) => environment.runChild(div([sum, xs.length]))))
 );
 
 describe('runChild', () => {
   it('runs another Task as a child', async () => {
-    const result = await withImplementations({ sum, div, average })(_ => {
+    const result = await withImplementations({ sum, div, average })((_) => {
       return mgFx.run(average([4, 8, 15, 16, 23, 42]));
+    }).pipe(promise);
+
+    expect(result).toBe(18);
+  });
+
+  it('returns a fluent interface', async () => {
+    const averageF = implement(
+      define({
+        name: 'average',
+        input: validateAny,
+        output: validateAny,
+      }),
+      (xs: number[], { runChild }) =>
+        runChild(sum(xs)).chain((sum) => runChild(div([sum, xs.length])))
+    );
+
+    const result = await withImplementations({ sum, div, averageF })((_) => {
+      return mgFx.run(averageF([4, 8, 15, 16, 23, 42]));
     }).pipe(promise);
 
     expect(result).toBe(18);
@@ -365,42 +403,4 @@ describe('local connector', () => {
       expect(err.name).toBe('NoImplementationError');
     }
   });
-});
-
-it('offers a fluent interface to callers', async () => {
-  const syncGreet = implement(
-    define({
-      name: 'syncGreet',
-      input: validateString,
-      output: validateString
-    }),
-    name => `Hello ${name}!`
-  );
-
-  const result = await withImplementation(syncGreet)(_ =>
-    mgFx
-      .run(syncGreet('World'))
-      .map(str => str.length)
-      .map(x => x + 1)
-  ).pipe(promise);
-
-  expect(result).toBe(13);
-});
-
-it('offers a fluent interface to Tasks', async () => {
-  const averageF = implement(
-    define({
-      name: 'average',
-      input: validateAny,
-      output: validateAny
-    }),
-    (xs: number[], { runChild }) =>
-      runChild(sum(xs)).chain(sum => runChild(div([sum, xs.length])))
-  );
-
-  const result = await withImplementations({ sum, div, averageF })(_ => {
-    return mgFx.run(averageF([4, 8, 15, 16, 23, 42]));
-  }).pipe(promise);
-
-  expect(result).toBe(18);
 });
