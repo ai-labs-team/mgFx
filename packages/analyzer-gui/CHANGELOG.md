@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.13...@mgfx/analyzer-gui@1.3.0) (2020-04-08)
+
+
+### Features
+
+* analyzer-gui: improve layout, add Parent summary info ([f13182d](https://github.com/ai-labs-team/mgFx/commit/f13182d))
+* analyzer-gui: scroll to and highlight parent Task ([ee3a489](https://github.com/ai-labs-team/mgFx/commit/ee3a489))
+
+
+
+
+
 ## [1.2.13](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-gui@1.2.12...@mgfx/analyzer-gui@1.2.13) (2020-04-07)
 
 **Note:** Version bump only for package @mgfx/analyzer-gui

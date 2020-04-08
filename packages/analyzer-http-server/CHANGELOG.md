@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.6](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.6.5...@mgfx/analyzer-http-server@0.6.6) (2020-04-08)
+
+**Note:** Version bump only for package @mgfx/analyzer-http-server
+
+
+
+
+
 ## [0.6.5](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-http-server@0.6.4...@mgfx/analyzer-http-server@0.6.5) (2020-04-07)
 
 **Note:** Version bump only for package @mgfx/analyzer-http-server

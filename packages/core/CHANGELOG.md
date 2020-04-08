@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.6.0...mgfx@0.6.1) (2020-04-08)
+
+
+### Bug Fixes
+
+* core: always return original input value from validation ([17e8c68](https://github.com/ai-labs-team/mgFx/commit/17e8c68))
+
+
+
+
+
 # [0.6.0](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.5.3...mgfx@0.6.0) (2020-04-03)
 
 
