@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.6.1...mgfx@0.6.2) (2020-04-08)
+
+**Note:** Version bump only for package mgfx
+
+
+
+
+
 ## [0.6.1](https://github.com/ai-labs-team/mgFx/compare/mgfx@0.6.0...mgfx@0.6.1) (2020-04-08)
 
 

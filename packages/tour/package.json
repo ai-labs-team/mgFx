@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/tour",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "A guided tour of mgFx fundamentals",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -20,7 +20,7 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "mgfx": "^0.6.1"
+    "mgfx": "^0.6.2"
   },
   "devDependencies": {
     "docco": "^0.8.0"
