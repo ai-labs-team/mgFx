@@ -53,7 +53,11 @@
 
     dd {
       margin-left: 0;
-      overflow-y: hidden;
+      overflow-x: hidden;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
 
     .bp3-tag {
@@ -68,12 +72,12 @@
   }
 
   .span-link {
-    .content {
+    max-width: 100%;
+
+    .bp3-button-text {
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      direction: rtl;
-      text-align: left;
     }
   }
 }

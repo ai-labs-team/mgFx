@@ -1,4 +1,22 @@
 @import '~@blueprintjs/core/src/common/variables';
+@keyframes highlight-outer {
+  100% {
+    opacity: 1 !important;
+    background-color: rgba($pt-intent-warning, 0.5);
+  }
+}
+
+@keyframes highlight-inner {
+  100% {
+    color: $pt-intent-warning;
+  }
+}
+
+@keyframes highlight-inner-dark {
+  100% {
+    color: $orange4;
+  }
+}
 
 .log {
   .spans {
@@ -39,6 +57,34 @@
           overflow: hidden;
           direction: rtl;
           text-align: left;
+        }
+
+        &.highlight {
+          animation: highlight-outer 0.5s ease-in-out alternate 6;
+
+          &[class*='bp3-icon-']::before,
+          > .bp3-icon:first-child,
+          .bp3-heading {
+            animation: highlight-inner 0.5s ease-in-out alternate 6;
+          }
+
+          .bp3-dark & {
+            &[class*='bp3-icon-']::before,
+            > .bp3-icon:first-child,
+            .bp3-heading {
+              animation: highlight-inner-dark 0.5s ease-in-out alternate 6;
+            }
+          }
+
+          &:hover {
+            animation: none;
+
+            &[class*='bp3-icon-']::before,
+            > .bp3-icon:first-child,
+            .bp3-heading {
+              animation: none;
+            }
+          }
         }
       }
 

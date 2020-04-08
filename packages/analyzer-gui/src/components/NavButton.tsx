@@ -3,11 +3,11 @@ import {
   useLocation,
   useHistory,
   NavLinkProps,
-  matchPath
+  matchPath,
 } from 'react-router-dom';
 import {
   resolveToLocation,
-  normalizeToLocation
+  normalizeToLocation,
   // @ts-ignore
 } from 'react-router-dom/modules/utils/locationUtils';
 import { Button, IButtonProps } from '@blueprintjs/core';
@@ -25,14 +25,14 @@ export const NavButton: React.FC<Props> = ({
 
   const onClick = React.useCallback(() => {
     const newLocation = resolveToLocation(to, location);
-    replace ? history.replace(location) : history.push(location);
+    replace ? history.replace(newLocation) : history.push(newLocation);
   }, [to, replace, history]);
 
   const isActive = React.useMemo(() => {
     const toLocation = normalizeToLocation(resolveToLocation(to, location));
     return !!matchPath(location.pathname, {
       path: toLocation.pathname,
-      exact
+      exact,
     });
   }, [to, exact, location]);
 

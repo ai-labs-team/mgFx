@@ -1,11 +1,12 @@
 import React from 'react';
-import { Tag, Classes, Spinner } from '@blueprintjs/core';
+import { Button, Tag, Classes, Spinner } from '@blueprintjs/core';
 import { Span } from '@mgfx/analyzer';
 import { useKefir } from 'use-kefir';
 import classNames from 'classnames';
 
 import { useAppContext } from '../../contexts/App';
 import { stateIntent, stateIcon } from '../../common';
+import { NavButton } from '../NavButton';
 
 type Props = {
   id: string;
@@ -40,10 +41,15 @@ export const SpanLink: React.FC<Props> = ({ id }) => {
   );
 
   return (
-    <Tag large minimal className="span-link" intent={intent} icon={icon}>
-      <span className={classNames('content', Classes.MONOSPACE_TEXT)}>
-        {span ? span.process.spec.name : id}
-      </span>
-    </Tag>
+    <NavButton
+      minimal
+      className={classNames('span-link', Classes.MONOSPACE_TEXT)}
+      intent={intent}
+      icon={icon}
+      to={{ hash: id }}
+      replace
+    >
+      {span ? span.process.spec.name : id}
+    </NavButton>
   );
 };
