@@ -16,9 +16,9 @@ import * as utils from './test-utils';
 
 const mgFx = localConnector();
 
-const validateString: Validator<String> = resolve;
-const validateAny: Validator<any> = resolve;
-const validateVoid: Validator<void> = resolve;
+const validateString: Validator<String> = () => resolve('ok');
+const validateAny: Validator<any> = () => resolve(true);
+const validateVoid: Validator<void> = () => resolve(undefined);
 const invalidateAny: Validator<any> = (value: unknown) =>
   reject(new ValidationError(`Invalid data: ${value}`)) as any;
 

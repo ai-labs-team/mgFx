@@ -66,18 +66,20 @@ export type TypeOf<T> = T extends Validator<infer U> ? U : never;
  * `InputValidationError`.
  */
 export const validateInput = <T>(validator: Validator<T>, value: T) =>
-  validator(value).pipe(
-    chainRej(reason => reject(new InputValidationError(reason.errors)))
-  );
+  validator(value)
+    .pipe(chainRej((reason) => reject(new InputValidationError(reason.errors))))
+    .pipe(always(value));
 
 /**
  * Specialized application of a Validator function and value, that coerces validation failure errors to
  * `OutputValidationError`.
  */
 export const validateOutput = <T>(validator: Validator<T>, value: T) =>
-  validator(value).pipe(
-    chainRej(reason => reject(new OutputValidationError(reason.errors)))
-  );
+  validator(value)
+    .pipe(
+      chainRej((reason) => reject(new OutputValidationError(reason.errors)))
+    )
+    .pipe(always(value));
 
 /**
  * Specialized application of multiple Validator functions and values contained within an object.
@@ -98,14 +100,20 @@ export const validateContext = <T>(
 
   const validatorKeys = Object.keys(validators);
 
-  const validations = validatorKeys.map(key => {
+  const validations = validatorKeys.map((key) => {
     const validator = validators[key as keyof T];
     const value = context.values[key as keyof T];
 
     return validator(value).pipe(
-      chainRej(reason => reject(new ContextValidationError(key, reason.errors)))
+      chainRej((reason) =>
+        reject(new ContextValidationError(key, reason.errors))
+      )
     );
   });
 
-  return parallel(validatorKeys.length)(validations).pipe(map(_ => context));
+  return parallel(validatorKeys.length)(validations).pipe(
+    always(context.values)
+  );
 };
+
+const always = <T>(value: T) => map(() => value);
