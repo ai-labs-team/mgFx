@@ -4,12 +4,13 @@ import { HashRouter, Route } from 'react-router-dom';
 import { httpClient } from '@mgfx/analyzer-http-client';
 import EventSource from 'eventsource';
 
+import { AppContext } from 'src/contexts/App';
+import { useKey } from 'src/hooks/useConfig';
+import { Server } from 'src/config';
+
 import { Header } from './Header';
 import { ConfigDialog } from './ConfigDialog';
 import { Log } from '../routes/Log';
-import { useKey } from '../hooks/useConfig';
-import { AppContext } from '../contexts/App';
-import { Server } from '../config';
 import { ServerDialog } from './ServerDialog';
 
 import './App.scss';

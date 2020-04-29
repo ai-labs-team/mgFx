@@ -1,3 +1,5 @@
+const TsConfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin');
+
 const rules = require('./webpack.rules');
 const plugins = require('./webpack.plugins');
 
@@ -23,6 +25,9 @@ module.exports = {
   plugins: plugins,
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
+    plugins: [
+      new TsConfigPathsWebpackPlugin({ configFile: './tsconfig.json' }),
+    ],
     alias: {
       'react-dom': '@hot-loader/react-dom'
     }
