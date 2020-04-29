@@ -6,30 +6,34 @@ const plugins = require('./webpack.plugins');
 rules.push(
   {
     test: /\.css$/,
-    use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
+    use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
   },
   {
     test: /\.s[ac]ss$/i,
     use: [
       { loader: 'style-loader' },
       { loader: 'css-loader' },
-      { loader: 'sass-loader' }
-    ]
+      { loader: 'sass-loader' },
+    ],
   }
 );
 
 module.exports = {
   module: {
-    rules
+    rules,
   },
-  plugins: plugins,
+  plugins,
+  output: {
+    chunkFilename: 'main_window/[name].js',
+    publicPath: '../',
+  },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
     plugins: [
       new TsConfigPathsWebpackPlugin({ configFile: './tsconfig.json' }),
     ],
     alias: {
-      'react-dom': '@hot-loader/react-dom'
-    }
-  }
+      'react-dom': '@hot-loader/react-dom',
+    },
+  },
 };

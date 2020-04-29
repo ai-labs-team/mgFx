@@ -17,7 +17,7 @@ export const config = new Store<Schema>({
   schema: {
     logDisplayMode: {
       enum: ['list', 'tree'],
-      default: 'list'
+      default: 'list',
     },
     logParameters: {
       type: 'object',
@@ -25,17 +25,17 @@ export const config = new Store<Schema>({
         limit: 100,
         order: {
           field: 'createdAt',
-          direction: 'desc'
-        }
-      } as SpanParameters
+          direction: 'desc',
+        },
+      } as SpanParameters,
     },
     inspectorPosition: {
       enum: ['side', 'bottom'],
-      default: 'bottom'
+      default: 'bottom',
     },
     theme: {
       enum: ['light', 'dark'],
-      default: 'dark'
+      default: 'dark',
     },
     servers: {
       type: 'array',
@@ -44,11 +44,11 @@ export const config = new Store<Schema>({
         properties: {
           baseUrl: {
             type: 'string',
-            format: 'uri'
-          }
-        }
+            format: 'uri',
+          },
+        },
       },
-      default: []
-    }
-  }
+      default: [],
+    },
+  },
 });
