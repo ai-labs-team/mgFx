@@ -52,15 +52,12 @@ const App: React.FC = () => {
   return (
     <AppContext.Provider value={appContext}>
       <ServerDialog isOpen={!selectedServer} onSelect={setSelectedServer} />
+      <ConfigDialog isOpen={showConfig} onClose={() => setShowConfig(false)} />
       {selectedServer ? (
         <HashRouter>
           <Header />
           <div className="content">
             <Route path="/" component={Log} />
-            <ConfigDialog
-              isOpen={showConfig}
-              onClose={() => setShowConfig(false)}
-            />
           </div>
         </HashRouter>
       ) : null}
