@@ -1,16 +1,16 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Redirect } from 'react-router-dom';
 import { httpClient } from '@mgfx/analyzer-http-client';
 import EventSource from 'eventsource';
 
 import { AppContext } from 'src/contexts/App';
 import { useKey } from 'src/hooks/useConfig';
+import { Explore } from 'src/routes/Explore';
 import { Server } from 'src/config';
 
 import { Header } from './Header';
 import { ConfigDialog } from './ConfigDialog';
-import { Log } from '../routes/Log';
 import { ServerDialog } from './ServerDialog';
 
 import './App.scss';
@@ -58,8 +58,9 @@ const App: React.FC = () => {
         <HashRouter>
           <Header />
           <div className="content">
-            <Route path="/" component={Log} />
+            <Explore />
           </div>
+          <Redirect to="/log" />
         </HashRouter>
       ) : null}
     </AppContext.Provider>

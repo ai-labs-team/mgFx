@@ -8,24 +8,23 @@ import {
   Popover,
   Button,
   Menu,
-  NonIdealState
+  NonIdealState,
 } from '@blueprintjs/core';
+import { constant } from 'kefir';
 import { useKefir } from 'use-kefir';
 
-import { config } from '../config';
-import { useAppContext } from '../contexts/App';
-import { useKey } from '../hooks/useConfig';
+import { config } from 'src/config';
+import { useAppContext } from 'src/contexts/App';
+import { useKey } from 'src/hooks/useConfig';
+
+import { useSelectedId } from '../Explore';
 import { IOTab } from './Inspector/IOTab';
 import { SummaryTab } from './Inspector/SummaryTab';
 
 import './Inspector.scss';
 
-type Props = {
-  span?: string;
-  onClose: () => void;
-};
-
-export const Inspector: React.FC<Props> = ({ span, onClose }) => {
+export const Inspector: React.FC = () => {
+  const [selectedId] = useSelectedId();
   const inspectorPosition = useKey('inspectorPosition');
   const { client } = useAppContext();
 
@@ -34,30 +33,32 @@ export const Inspector: React.FC<Props> = ({ span, onClose }) => {
   const [error, setError] = React.useState<any>();
 
   const selectedSpan = useKefir<Span | undefined>(
-    client.query
-      .spans({ scope: { id: span }, limit: 1 })
-      .watch()
-      .withHandler<Span, Span[]>((emitter, event) => {
-        if (event.type === 'error') {
-          setError(event.value);
-          return;
-        }
+    selectedId
+      ? client.query
+          .spans({ scope: { id: selectedId }, limit: 1 })
+          .watch()
+          .withHandler<Span, Span[]>((emitter, event) => {
+            if (event.type === 'error') {
+              setError(event.value);
+              return;
+            }
 
-        if (event.type === 'end') {
-          return;
-        }
+            if (event.type === 'end') {
+              return;
+            }
 
-        const [span] = event.value;
-        emitter.emit(span);
-        setError(undefined);
-        setIsStale(false);
+            const [span] = event.value;
+            emitter.emit(span);
+            setError(undefined);
+            setIsStale(false);
 
-        if (span.state !== 'running') {
-          emitter.end();
-        }
-      }),
+            if (span.state !== 'running') {
+              emitter.end();
+            }
+          })
+      : constant(undefined),
     undefined,
-    [span]
+    [selectedId]
   );
 
   const tabContent = React.useMemo(() => {
@@ -78,7 +79,7 @@ export const Inspector: React.FC<Props> = ({ span, onClose }) => {
           title="Loading Process"
           description={
             <span>
-              Loading Process ID <Code>{span}</Code>...
+              Loading Process ID <Code>{selectedId}</Code>...
             </span>
           }
         />
@@ -111,13 +112,13 @@ export const Inspector: React.FC<Props> = ({ span, onClose }) => {
 
   React.useEffect(() => {
     setIsStale(true);
-  }, [span]);
+  }, [selectedId]);
 
   return (
     <div className="inspector">
       <Tabs
         selectedTabId={selectedTab}
-        onChange={id => setSelectedTab(id as string)}
+        onChange={(id) => setSelectedTab(id as string)}
       >
         <Tab id="io" title="Input/Output" />
         <Tab id="summary" title="Summary" />

@@ -3,7 +3,7 @@ import { Span } from '@mgfx/analyzer';
 import { titleCase } from 'title-case';
 import { Tag, Classes } from '@blueprintjs/core';
 
-import { stateIntent, stateIcon } from '../../common';
+import { stateIntent, stateIcon } from 'src/common';
 import { SpanLink } from './SpanLink';
 
 type Props = {

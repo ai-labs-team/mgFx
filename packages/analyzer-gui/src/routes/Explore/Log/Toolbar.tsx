@@ -1,9 +1,8 @@
 import React from 'react';
-import { SpanParameters } from '@mgfx/analyzer';
 import { Button, Popover, Menu } from '@blueprintjs/core';
 
-import { useKey } from '../../hooks/useConfig';
-import { config } from '../../config';
+import { useKey } from 'src/hooks/useConfig';
+import { config } from 'src/config';
 
 import { LimitDialog } from './Toolbar/LimitDialog';
 

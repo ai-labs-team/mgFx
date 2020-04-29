@@ -1,10 +1,11 @@
 import React from 'react';
+
 import { Span } from '@mgfx/analyzer';
+import { NonIdealState } from '@blueprintjs/core';
 import SplitPane from 'react-split-pane';
 import { ObjectInspector } from 'react-inspector';
 
-import { useKey } from '../../hooks/useConfig';
-import { NonIdealState } from '@blueprintjs/core';
+import { useKey } from 'src/hooks/useConfig';
 
 type Props = {
   span: Span;

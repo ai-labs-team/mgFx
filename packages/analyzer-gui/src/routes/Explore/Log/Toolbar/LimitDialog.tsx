@@ -7,11 +7,11 @@ import {
   RadioGroup,
   Radio,
   FormGroup,
-  NumericInput
+  NumericInput,
 } from '@blueprintjs/core';
 import { assocPath } from 'ramda';
 
-import { useConfig } from '../../../hooks/useConfig';
+import { useConfig } from '../../../../hooks/useConfig';
 
 type Props = {
   isOpen: boolean;
@@ -38,7 +38,7 @@ export const LimitDialog: React.FC<Props> = ({ isOpen, onClose }) => {
         </Callout>
         <RadioGroup
           label="Display Limit"
-          onChange={event => {
+          onChange={(event) => {
             setIsInfinite(event.currentTarget.value as any);
           }}
           selectedValue={isInfinite}

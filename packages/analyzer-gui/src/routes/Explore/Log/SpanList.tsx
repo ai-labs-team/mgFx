@@ -5,15 +5,16 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import classNames from 'classnames';
 import { FixedSizeList } from 'react-window';
 
-import { stateIntent, stateIcon } from '../../common';
-import { Schema } from '../../config';
-import { useKey } from '../../hooks/useConfig';
-import { useLocation } from 'react-router-dom';
+import { rootsAndOrphansIn, childrenOf } from 'src/utils';
+import { stateIntent, stateIcon } from 'src/common';
+import { Schema } from 'src/config';
+import { useKey } from 'src/hooks/useConfig';
 
 type Props = {
   spans: Span[];
   selectedId?: string;
   onSelect: (id: string) => void;
+  highlightId?: string;
 };
 
 type ItemProps = {
@@ -34,88 +35,73 @@ const Item: React.FC<ItemProps> = ({
 }) => {
   const [depth, span] = layout[index];
 
+  const onClick = React.useCallback<React.MouseEventHandler>(
+    (event) => {
+      event.stopPropagation();
+      onSelect(selectedId !== span.id ? span.id : undefined);
+    },
+    [selectedId, span.id]
+  );
+
   return (
-    <Callout
-      style={{
-        ...style,
-        left: (style.left as number) + 20 * depth,
-        right: 0,
-        height: (style.height as number) - 1,
-        width: 'auto',
-      }}
+    <div
       className={classNames('item', {
         selected: selectedId === span.id,
         highlight: highlightId === span.id,
       })}
-      intent={stateIntent(span)}
-      icon={stateIcon({ span, size: 20 })}
-      onClick={() => onSelect(span.id)}
+      style={{
+        ...style,
+        left: (style.left as number) + 20 * depth,
+        right: 0,
+        width: 'auto',
+      }}
+      onClick={onClick}
     >
-      <H4 className={classNames('name', Classes.MONOSPACE_TEXT)}>
-        {span.process.spec.name}
-      </H4>
-    </Callout>
+      <Callout intent={stateIntent(span)} icon={stateIcon({ span, size: 20 })}>
+        <H4 className={classNames('name', Classes.MONOSPACE_TEXT)}>
+          {span.process.spec.name}
+        </H4>
+      </Callout>
+    </div>
   );
 };
 
-export const SpanList: React.FC<Props> = ({ spans, selectedId, onSelect }) => {
+export const SpanList: React.FC<Props> = ({
+  spans,
+  selectedId,
+  onSelect,
+  highlightId,
+}) => {
   const displayMode = useKey('logDisplayMode');
-  const location = useLocation();
-  const [highlightId, setHighlightId] = React.useState<string>();
-  const [pinnedId, setPinnedId] = React.useState<string>();
 
   const layout = React.useMemo(() => computeLayout(displayMode, spans), [
     displayMode,
     spans,
   ]);
 
-  const scrollToId = React.useCallback(
-    (id?: string) => {
-      if (!id) {
-        return;
-      }
-
-      const index = spans.findIndex((span) => span.id === id);
-      if (index < 0) {
-        return;
-      }
-
-      list.current.scrollToItem(index, 'smart');
-    },
-    [spans]
+  const [visibleHighlightId, setVisibleHighlightId] = React.useState(
+    highlightId
   );
 
   React.useEffect(() => {
-    const id = location.hash.replace('#', '');
-    if (!id) {
-      return;
-    }
-
-    setPinnedId(id);
-    setHighlightId(id);
-    scrollToId(id);
+    setVisibleHighlightId(highlightId);
 
     const timeout = setTimeout(() => {
-      setHighlightId(undefined);
+      setVisibleHighlightId(undefined);
     }, 3000);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [location]);
+  }, [highlightId]);
 
   React.useEffect(() => {
-    setHighlightId(undefined);
-    setPinnedId(selectedId);
+    setVisibleHighlightId(undefined);
   }, [selectedId]);
 
-  React.useEffect(() => {
-    if (pinnedId) {
-      scrollToId(pinnedId);
-    }
-  }, [spans]);
-
-  const list = React.useRef<FixedSizeList>();
+  const onListClicked = React.useCallback(() => {
+    onSelect(undefined);
+  }, []);
 
   if (!spans.length) {
     return (
@@ -134,7 +120,10 @@ export const SpanList: React.FC<Props> = ({ spans, selectedId, onSelect }) => {
   }
 
   return (
-    <div className={classNames('list', { 'has-selection': !!selectedId })}>
+    <div
+      className={classNames('list', { 'has-selection': !!selectedId })}
+      onClick={onListClicked}
+    >
       <AutoSizer>
         {({ width, height }) => (
           <FixedSizeList
@@ -142,8 +131,12 @@ export const SpanList: React.FC<Props> = ({ spans, selectedId, onSelect }) => {
             width={width}
             itemCount={spans.length}
             itemSize={40}
-            itemData={{ layout, onSelect, selectedId, highlightId }}
-            ref={list}
+            itemData={{
+              layout,
+              onSelect,
+              selectedId,
+              highlightId: visibleHighlightId,
+            }}
           >
             {Item}
           </FixedSizeList>
@@ -158,12 +151,9 @@ type Layout = [
   Span
 ][];
 
-const isParentOf = (a: Span) => (b: Span) => b.id === a.parentId;
-const isChildOf = (a: Span) => (b: Span) => b.parentId === a.id;
-
 const computeTreeLayout = (spans: Span[], roots: Span[], depth = 0): Layout =>
   roots.reduce((layout, root) => {
-    const children = spans.filter(isChildOf(root));
+    const children = childrenOf(root, spans);
 
     return layout.concat(
       [[depth, root]],
@@ -179,9 +169,6 @@ const computeLayout = (
     return spans.map((span) => [0, span]);
   }
 
-  const roots = spans.filter(
-    (span) => !span.parentId || !spans.find(isParentOf(span))
-  );
-
+  const roots = rootsAndOrphansIn(spans);
   return computeTreeLayout(spans, roots);
 };

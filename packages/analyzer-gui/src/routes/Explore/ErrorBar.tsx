@@ -1,10 +1,12 @@
 import React from 'react';
-import { Code, Classes, Callout } from '@blueprintjs/core';
+import { Code, Callout } from '@blueprintjs/core';
 import { pathOr } from 'ramda';
 
 type Props = {
   error: any;
 };
+
+import './ErrorBar.scss';
 
 export const ErrorBar: React.FC<Props> = ({ error }) => {
   if (!error) {
