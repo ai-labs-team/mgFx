@@ -21,8 +21,9 @@
     }
   },
   "scripts": {
+    "build-all": "lerna run build",
     "postinstall": "node node_modules/husky/lib/installer/bin install",
-    "clean": "rimraf packages/**/dist"
+    "clean-all": "lerna run clean"
   },
   "workspaces": {
     "packages": [
