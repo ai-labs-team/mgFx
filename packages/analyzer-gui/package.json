@@ -73,6 +73,7 @@
     "@electron-forge/plugin-webpack": "6.0.0-beta.50",
     "@hot-loader/react-dom": "^16.13.0",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "@types/d3-time-format": "^2.1.1",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
@@ -97,16 +98,24 @@
   "dependencies": {
     "@blueprintjs/core": "^3.24.0",
     "@mgfx/analyzer-http-client": "^0.3.17",
+    "@react-hook/throttle": "^1.0.12",
     "@types/classnames": "^2.2.10",
     "@types/ramda": "^0.26.44",
+    "@vx/axis": "^0.0.195",
+    "@vx/grid": "^0.0.195",
+    "@vx/scale": "^0.0.195",
+    "@vx/zoom": "^0.0.195",
     "classnames": "^2.2.6",
+    "d3-time-format": "^2.2.3",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^5.1.1",
     "eventsource": "^1.0.7",
     "node-sass": "^4.13.1",
+    "query-string": "^6.12.1",
     "ramda": "^0.27.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "react-hooks-worker": "^0.9.0",
     "react-hot-loader": "^4.12.20",
     "react-inspector": "^5.0.1",
     "react-router-dom": "^5.1.2",
@@ -115,6 +124,14 @@
     "react-window": "^1.8.5",
     "sass-loader": "^8.0.2",
     "title-case": "^3.0.2",
-    "use-kefir": "^1.0.1"
+    "use-kefir": "^1.0.1",
+    "worker-plugin": "^4.0.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "resolutions": {
+    "@electron-forge/plugin-webpack/webpack": "4.41.5"
   }
 }
