@@ -73,7 +73,7 @@ it('performs a `get` query', async () => {
   expect(result[0].process.spec.name).toBe('add');
   expect(result[0].input).toEqual([1, 2]);
   expect(result[0].state).toBe('resolved');
-  expect((result[0] as any).value).toBe(3);
+  expect((result[0] as any).output).toBe(3);
 });
 
 it('performs a `watch` query', async () => {
@@ -87,5 +87,5 @@ it('performs a `watch` query', async () => {
   expect(result[0].process.spec.name).toBe('add');
   expect(result[0].input).toEqual([1, 2]);
   expect(result[0].state).toBe('resolved');
-  expect((result[0] as any).value).toBe(3);
+  expect((result[0] as any).output).toBe(3);
 });

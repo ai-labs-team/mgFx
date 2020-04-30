@@ -167,4 +167,8 @@ describe('buffering', () => {
 
     expect(updates).toBe(1);
   });
+
+  afterAll(() => {
+    bufferedAnalyzer.receiver.shutdown();
+  });
 });
