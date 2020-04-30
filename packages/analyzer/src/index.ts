@@ -26,7 +26,10 @@ export type Config = {
   }>;
 };
 
-export type Receiver = (event: Event) => void;
+export type Receiver = {
+  shutdown: () => void;
+  (event: Event): void;
+};
 
 export type Analyzer = {
   receiver: Receiver;

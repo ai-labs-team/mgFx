@@ -4,7 +4,6 @@ import { stream, Emitter } from 'kefir';
 
 import { Config, Receiver } from '.';
 import { Storage } from './storage';
-import { resolve } from 'fluture';
 
 export const makeReceiver = (
   storage: Fluenture<any, Storage>,
@@ -41,13 +40,20 @@ export const makeBufferedReceiver = (
       putEvents.chain((putEvents) => putEvents(events)).value(onFlush);
     });
 
-  return (event) => {
-    _emitter.emit(event);
-  };
+  const receive = (event: Event) => _emitter.emit(event);
+  const shutdown = () => _emitter.end();
+
+  return Object.assign(receive, { shutdown });
 };
 
 export const makeDefaultReceiver = (
   storage: Fluenture<any, Storage>,
   onFlush: () => any
-): Receiver => (event) =>
-  storage.chain((storage) => storage.put.event(event)).value(onFlush);
+): Receiver => {
+  const receive = (event: Event) =>
+    storage.chain((storage) => storage.put.event(event)).value(onFlush);
+
+  const shutdown = () => {};
+
+  return Object.assign(receive, { shutdown });
+};

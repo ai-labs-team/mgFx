@@ -13,17 +13,20 @@ export type Config = {
 export const httpClient = (config: Config): Analyzer => {
   const { baseUrl, fetch, EventSource } = config;
 
-  const receiver = (event: Event) => {
-    const url = `${baseUrl}/collector`;
+  const receiver = Object.assign(
+    (event: Event) => {
+      const url = `${baseUrl}/collector`;
 
-    fetch(url, {
-      method: 'post',
-      body: JSON.stringify(event),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-  };
+      fetch(url, {
+        method: 'post',
+        body: JSON.stringify(event),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    },
+    { shutdown: () => {} }
+  );
 
   return {
     receiver,
