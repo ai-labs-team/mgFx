@@ -81,4 +81,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: analyzer-gui-dmg
-          path: packages/analyzer-gui/out/make/dmg/**/*
+          path: packages/analyzer-gui/out/make/*.dmg
