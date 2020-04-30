@@ -7,7 +7,7 @@ jobs:
   build-and-test:
     name: Build & Test (Node v${{ matrix.node-version }}, ${{ matrix.os }})
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
