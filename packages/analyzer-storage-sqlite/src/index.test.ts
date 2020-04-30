@@ -262,7 +262,7 @@ describe('query.spans', () => {
 
   describe('distinct operator', () => {
     it('supports `input`', async () => {
-      await connector.run(couldFail(0)).promise();
+      await connector.run(couldFail(0)).chain(after(10)).promise();
 
       shouldFail = true;
       await connector.run(couldFail(0)).alt(resolve('ok')).promise();
