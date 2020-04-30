@@ -1,4 +1,4 @@
-name: build
+name: build-and-test
 
 on:
   push:
@@ -10,6 +10,12 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v2
