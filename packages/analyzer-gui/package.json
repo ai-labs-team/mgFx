@@ -10,7 +10,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts .",
-    "make:deb": "yarn make --targets @electron-forge/maker-deb"
+    "make:deb": "yarn make --targets @electron-forge/maker-deb",
+    "make:dmg": "yarn make --targets @electron-forge/maker-dmg"
   },
   "keywords": [],
   "author": {
@@ -34,6 +35,10 @@
         },
         {
           "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
           "config": {}
         },
         {
@@ -95,6 +100,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.24.0",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.51",
     "@mgfx/analyzer-http-client": "^0.3.17",
     "@react-hook/throttle": "^1.0.12",
     "@types/classnames": "^2.2.10",

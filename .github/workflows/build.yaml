@@ -5,12 +5,13 @@ on:
 
 jobs:
   build-and-test:
-    name: Build & Test (Node v${{ matrix.node-version }})
+    name: Build & Test (Node v${{ matrix.node-version }}, ${{ matrix.os }})
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
+        os: [ubuntu-18.04, macos-10.15]
         node-version: [10.x, 12.x, 14.x]
 
     services:
@@ -38,13 +39,26 @@ jobs:
 
       - name: Make analyzer-gui .deb
         # TODO: Add another matrix column for OS (linux/macos) and build .dmg when on node 14 && running on macos
-        if: matrix.node-version == '14.x'
+        if: matrix.node-version == '14.x' && matrix.os == 'ubuntu-18.04'
         run: yarn make:deb
         working-directory: packages/analyzer-gui
 
-      - name: Upload .deb
-        if: matrix.node-version == '14.x'
+      - name: Upload analyzer-gui .deb
+        if: matrix.node-version == '14.x' && matrix.os == 'ubuntu-18.04'
         uses: actions/upload-artifact@v2
         with:
           name: analyzer-gui-deb
           path: packages/analyzer-gui/out/make/deb/x64/*.deb
+
+      - name: Make analyzer-gui .dmg
+        # TODO: Add another matrix column for OS (linux/macos) and build .dmg when on node 14 && running on macos
+        if: matrix.node-version == '14.x' && matrix.os == 'macos-10.15'
+        run: yarn make:dmg
+        working-directory: packages/analyzer-gui
+
+      - name: Upload analyzer-gui .dmg
+        if: matrix.node-version == '14.x' && matrix.os == 'macos-10.15'
+        uses: actions/upload-artifact@v2
+        with:
+          name: analyzer-gui-dmg
+          path: packages/analyzer-gui/out/make/dmg/**/*
