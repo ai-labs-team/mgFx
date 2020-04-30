@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build & Test
+    name: Build & Test (Node v${{ matrix.node-version }})
 
     runs-on: ubuntu-latest
 
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js
+      - name: Setup Node v${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
@@ -36,32 +36,15 @@ jobs:
       - name: Test
         run: yarn test
 
-  package-gui-deb:
-    name: analyzer-gui - Package .deb
-
-    needs: build-and-test
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.x
-
-      - name: Install dependencies
-        run: yarn
-
-      - name: Build
-        run: yarn build
-
-      - name: Make .deb
+      - name: Make analyzer-gui .deb
+        # TODO: Add another matrix column for OS (linux/macos) and build .dmg when on node 14 && running on macos
+        if: matrix.node-version == '14.x'
         run: yarn make:deb
         working-directory: packages/analyzer-gui
 
       - name: Upload .deb
-        uses: actions/upload-artifact@v1
+        if: matrix.node-version == '14.x'
+        uses: actions/upload-artifact@v2
         with:
           name: analyzer-gui-deb
           path: packages/analyzer-gui/out/make/deb/x64/*.deb
