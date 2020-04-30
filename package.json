@@ -21,9 +21,10 @@
     }
   },
   "scripts": {
-    "build-all": "lerna run build",
+    "build": "lerna run build",
+    "test": "lerna run test -- --passWithNoTests",
     "postinstall": "node node_modules/husky/lib/installer/bin install",
-    "clean-all": "lerna run clean"
+    "clean": "lerna run clean"
   },
   "workspaces": {
     "packages": [
