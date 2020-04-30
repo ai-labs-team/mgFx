@@ -1,26 +1,19 @@
 import { implement, define } from 'mgfx';
 import { ioTs, t } from '@mgfx/validator-iots';
-import {
-  chain,
-  coalesce,
-  Future,
-  FutureInstance,
-  map,
-  parallel
-} from 'fluture';
+import { coalesce, FutureInstance, map, parallel } from 'fluture';
 import { retryLinearly } from 'fluture-retry';
 import { Either, isRight, left, right } from 'fp-ts/lib/Either';
-import axios, { AxiosError } from 'axios';
+import { httpRequest } from '@mgfx/task-http-request';
 
 const parallelToleratingFailure = <L, R, T extends FutureInstance<L, R>>(
   concurrency: number
 ) => (futures: T[]) => {
-  const coalesced = futures.map(future =>
+  const coalesced = futures.map((future) =>
     future.pipe(coalesce<any, Either<L, R>>(left)(right))
   );
 
   return parallel(concurrency)(coalesced).pipe(
-    map(values => values.filter(isRight).map(value => value.right))
+    map((values) => values.filter(isRight).map((value) => value.right))
   );
 };
 
@@ -31,16 +24,16 @@ export const refresh = implement(
       t.union([
         t.type({ accountId: t.number }),
         t.type({ userId: t.number }),
-        t.type({ groupId: t.number })
+        t.type({ groupId: t.number }),
       ])
     ),
-    output: ioTs(t.array(t.number))
+    output: ioTs(t.array(t.number)),
   }),
   (params, { runChild }) => {
     if ('accountId' in params) {
-      return runChild(refreshAccount(params.accountId)).pipe(
-        map(() => [params.accountId])
-      );
+      return runChild(refreshAccount(params.accountId)).map(() => [
+        params.accountId,
+      ]);
     }
 
     if ('userId' in params) {
@@ -60,23 +53,20 @@ export const refreshAccount = implement(
   define({
     name: 'refreshAccount',
     input: ioTs(t.number),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   (accountId, { runChild }) =>
-    getAccount(accountId)
-      .pipe(runChild)
-      .pipe(
-        chain(account =>
+    runChild(getAccount(accountId))
+      .chain((account) =>
+        runChild(
           getBalance({
             institution: account.institution,
-            reference: account.reference
+            reference: account.reference,
           })
         )
       )
-      .pipe(runChild)
-      .pipe(chain(balance => updateBalance({ accountId, balance })))
-      .pipe(runChild)
-      .pipe(map(() => accountId))
+      .chain((balance) => runChild(updateBalance({ accountId, balance })))
+      .map(() => accountId)
       .pipe(retryLinearly)
 );
 
@@ -84,91 +74,35 @@ export const refreshUserAccounts = implement(
   define({
     name: 'refreshUserAccounts',
     input: ioTs(t.number),
-    output: ioTs(t.array(t.number))
+    output: ioTs(t.array(t.number)),
   }),
   (userId, { runChild }) =>
-    getUserAccountIds(userId)
-      .pipe(runChild)
-      .pipe(
-        map(accountIds =>
-          accountIds.map(accountId => refreshAccount(accountId).pipe(runChild))
-        )
+    runChild(getUserAccountIds(userId))
+      .map((accountIds) =>
+        accountIds.map((accountId) => runChild(refreshAccount(accountId)))
       )
-      .pipe(chain(parallelToleratingFailure(2)))
+      .chain(parallelToleratingFailure(2))
 );
 
 export const refreshGroupAccounts = implement(
   define({
     name: 'refreshGroupAccounts',
     input: ioTs(t.number),
-    output: ioTs(t.array(t.number))
+    output: ioTs(t.array(t.number)),
   }),
   (groupId, { runChild }) =>
-    getGroupUserIds(groupId)
-      .pipe(runChild)
-      .pipe(
-        map(userIds =>
-          userIds.map(userId => refreshUserAccounts(userId).pipe(runChild))
-        )
+    runChild(getGroupUserIds(groupId))
+      .map((userIds) =>
+        userIds.map((userId) => runChild(refreshUserAccounts(userId)))
       )
-      .pipe(chain(parallel(2)))
-      .pipe(map(ids => ids.reduce((result, ids) => result.concat(ids))))
-);
-
-export const httpRequest = implement(
-  define({
-    name: 'httpRequest',
-    input: ioTs(
-      t.intersection([
-        t.type({
-          url: t.string,
-          method: t.keyof({
-            get: null,
-            post: null,
-            put: null,
-            patch: null,
-            delete: null
-          })
-        }),
-        t.partial({
-          data: t.any,
-          headers: t.record(t.string, t.string)
-        })
-      ])
-    ),
-    output: ioTs(t.any),
-    context: {
-      correlationId: ioTs(t.union([t.string, t.undefined]))
-    }
-  }),
-  ({ url, method, data, headers }, { context: { correlationId = '' } }) =>
-    Future((reject, resolve) => {
-      const source = axios.CancelToken.source();
-
-      axios({
-        url,
-        method,
-        data,
-        headers: {
-          ...headers,
-          'X-Correlation-Id': correlationId
-        }
-      })
-        .then((response: any) => resolve(response.data))
-        .catch((error: AxiosError) => {
-          reject(new Error(error.message));
-        });
-
-      return () => {
-        source.cancel();
-      };
-    })
+      .chain(parallel(2))
+      .map((ids) => ids.reduce((result, ids) => result.concat(ids)))
 );
 
 const account = ioTs(
   t.type({
     institution: t.string,
-    reference: t.string
+    reference: t.string,
   })
 );
 
@@ -178,21 +112,19 @@ export const getAccount = implement(
     input: ioTs(t.number),
     output: account,
     context: {
-      coreUrl: ioTs(t.string)
-    }
+      coreUrl: ioTs(t.string),
+    },
   }),
   (accountId, { runChild, context: { coreUrl } }) =>
-    httpRequest({
-      url: `${coreUrl}/accounts/${accountId}`,
-      method: 'get'
-    })
-      .pipe(runChild)
-      .pipe(
-        map(account => ({
-          institution: account.institution,
-          reference: account.institution_reference
-        }))
-      )
+    runChild(
+      httpRequest({
+        url: `${coreUrl}/accounts/${accountId}`,
+        method: 'get',
+      })
+    ).map((account) => ({
+      institution: account.institution,
+      reference: account.institution_reference,
+    }))
 );
 
 export const getUserAccountIds = implement(
@@ -201,16 +133,16 @@ export const getUserAccountIds = implement(
     input: ioTs(t.number),
     output: ioTs(t.array(t.number)),
     context: {
-      coreUrl: ioTs(t.string)
-    }
+      coreUrl: ioTs(t.string),
+    },
   }),
   (userId, { runChild, context: { coreUrl } }) =>
-    httpRequest({
-      url: `${coreUrl}/accounts?user_id=${userId}`,
-      method: 'get'
-    })
-      .pipe(runChild)
-      .pipe(map(accounts => accounts.map((account: any) => account.id)))
+    runChild(
+      httpRequest({
+        url: `${coreUrl}/accounts?user_id=${userId}`,
+        method: 'get',
+      })
+    ).map((accounts) => accounts.map((account: any) => account.id))
 );
 
 export const getGroupUserIds = implement(
@@ -219,16 +151,16 @@ export const getGroupUserIds = implement(
     input: ioTs(t.number),
     output: ioTs(t.array(t.number)),
     context: {
-      coreUrl: ioTs(t.string)
-    }
+      coreUrl: ioTs(t.string),
+    },
   }),
   (groupId, { runChild, context: { coreUrl } }) =>
-    httpRequest({
-      url: `${coreUrl}/group_memberships?group_id=${groupId}&role=user`,
-      method: 'get'
-    })
-      .pipe(runChild)
-      .pipe(map(members => members.map((member: any) => member.user_id)))
+    runChild(
+      httpRequest({
+        url: `${coreUrl}/group_memberships?group_id=${groupId}&role=user`,
+        method: 'get',
+      })
+    ).map((members) => members.map((member: any) => member.user_id))
 );
 
 export const updateBalance = implement(
@@ -237,32 +169,32 @@ export const updateBalance = implement(
     input: ioTs(
       t.type({
         accountId: t.number,
-        balance: t.number
+        balance: t.number,
       })
     ),
     output: ioTs(t.void),
     context: {
-      coreUrl: ioTs(t.string)
-    }
+      coreUrl: ioTs(t.string),
+    },
   }),
   ({ accountId, balance }, { runChild, context: { coreUrl } }) =>
-    httpRequest({
-      url: `${coreUrl}/accounts/${accountId}`,
-      method: 'patch',
-      data: {
-        balance,
-        last_refreshed: Date.now()
-      }
-    })
-      .pipe(runChild)
-      .pipe(map(() => undefined))
+    runChild(
+      httpRequest({
+        url: `${coreUrl}/accounts/${accountId}`,
+        method: 'patch',
+        data: {
+          balance,
+          last_refreshed: Date.now(),
+        },
+      })
+    ).map(() => undefined)
 );
 
 export const getBalance = implement(
   define({
     name: 'getBalance',
     input: account,
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   (account, { runChild }) => {
     if (account.institution === 'bankA') {
@@ -285,16 +217,16 @@ export const bankA = implement(
     input: ioTs(t.string),
     output: ioTs(t.number),
     context: {
-      bankAUrl: ioTs(t.string)
-    }
+      bankAUrl: ioTs(t.string),
+    },
   }),
   (reference, { runChild, context: { bankAUrl } }) =>
-    httpRequest({
-      url: `${bankAUrl}/accounts/${reference}`,
-      method: 'get'
-    })
-      .pipe(runChild)
-      .pipe(map(response => response.balance))
+    runChild(
+      httpRequest({
+        url: `${bankAUrl}/accounts/${reference}`,
+        method: 'get',
+      })
+    ).map((response) => response.balance)
 );
 
 export const bankB = implement(
@@ -303,17 +235,19 @@ export const bankB = implement(
     input: ioTs(t.string),
     output: ioTs(t.number),
     context: {
-      bankBUrl: ioTs(t.string)
-    }
+      bankBUrl: ioTs(t.string),
+    },
   }),
   (reference, { runChild, context: { bankBUrl } }) => {
     const path = reference.startsWith('S') ? 'savings' : 'investments';
 
-    return httpRequest({
-      url: `${bankBUrl}/${path}/${reference}`,
-      method: 'get'
-    })
-      .pipe(runChild)
-      .pipe(map(response => parseFloat(response.balance)));
+    return runChild(
+      httpRequest({
+        url: `${bankBUrl}/${path}/${reference}`,
+        method: 'get',
+      })
+    ).map((response) => parseFloat(response.balance));
   }
 );
+
+export { httpRequest };

@@ -10,7 +10,7 @@ import { bodyParser } from 'json-server';
 
 const connector = localConnector();
 const analyzer = makeAnalyzer({
-  storage: sqlite({})
+  storage: sqlite({}),
 });
 connector.use(analyzer.collector);
 // @ts-ignore
@@ -27,11 +27,11 @@ export const bridge = Router()
         coreUrl: `${baseUrl}/core`,
         bankAUrl: `${baseUrl}/external/bankA`,
         bankBUrl: `${baseUrl}/external/bankB`,
-        bankCUrl: `${baseUrl}/external/bankC`
-      }
+        bankCUrl: `${baseUrl}/external/bankC`,
+      },
     })
   )
   .use('/mgFx', httpServer({ analyzer }))
-  .post('/accounts/refresh', req => {
-    req.mgFx.runPid(tasks.refresh(req.body));
+  .post('/accounts/refresh', (req) => {
+    req.mgFx.runF(tasks.refresh(req.body));
   });
