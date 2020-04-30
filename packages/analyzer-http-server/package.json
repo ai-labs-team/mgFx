@@ -16,7 +16,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.json",
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "bugs": {
     "url": "https://github.com/ai-labs-team/mgFx/issues"
