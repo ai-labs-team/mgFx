@@ -31,8 +31,7 @@
       "packages/*"
     ],
     "nohoist": [
-      "**/electron",
-      "**/electron-squirrel-startup"
+      "mgfx-analyzer-gui/**/*"
     ]
   }
 }

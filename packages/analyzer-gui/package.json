@@ -1,7 +1,6 @@
 {
-  "name": "@mgfx/analyzer-gui",
+  "name": "mgfx-analyzer-gui",
   "private": true,
-  "productName": "analyzer-gui",
   "version": "1.3.1",
   "description": "A Desktop client for analyzing mgFx applications",
   "main": ".webpack/main",
@@ -24,9 +23,7 @@
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "analyzer_gui"
-          }
+          "config": {}
         },
         {
           "name": "@electron-forge/maker-zip",
@@ -130,8 +127,5 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
-  },
-  "resolutions": {
-    "@electron-forge/plugin-webpack/webpack": "4.41.5"
   }
 }
