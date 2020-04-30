@@ -20,7 +20,7 @@ type Props = {
   account: TAccount;
 };
 
-export const Account: React.FC<Props> = props => {
+export const Account: React.FC<Props> = (props) => {
   const [account, setAccount] = React.useState(props.account);
   const [wasRefreshing, setWasRefreshing] = React.useState(false);
   const isRefreshing = useRefreshing({ accountId: account.id });
@@ -33,9 +33,9 @@ export const Account: React.FC<Props> = props => {
 
   React.useEffect(() => {
     if (!isRefreshing && wasRefreshing) {
-      request.get().then(account => setAccount(account));
+      request.get().then((account) => setAccount(account));
     }
-  }, [isRefreshing, wasRefreshing]);
+  }, [isRefreshing, wasRefreshing, request]);
 
   return (
     <Card>

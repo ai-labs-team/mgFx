@@ -66,6 +66,8 @@ export const DefaultProvder: React.FC = ({ children }) => {
 
   const obs = React.useMemo(() => combine({ accountIds, userIds, groupIds }), [
     accountIds,
+    userIds,
+    groupIds,
   ]);
 
   return <Context.Provider value={obs}>{children}</Context.Provider>;
@@ -90,7 +92,7 @@ export const useRefreshing = (options: UseRefreshingOptions) => {
             : [options.groupId, state.groupIds]
         )
         .map(([needle, haystack]) => haystack.includes(needle)),
-    [stream]
+    [stream, options]
   );
 
   return useKefir(state, false, []);

@@ -55,7 +55,7 @@ export const TraceButton: React.FC<Props> = (props) => {
       .get()
       .pipe(map((spans) => spans[0].id))
       .pipe(fork(console.error)(setProcessId));
-  }, [isOpen]);
+  }, [isRefreshing, isOpen, props]);
 
   const content = React.useMemo(() => {
     if (!processId) {
