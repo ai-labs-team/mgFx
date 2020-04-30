@@ -87,7 +87,7 @@ export type ServeFn = <S extends Spec>(
  * a JavaScript module.
  */
 export type ImplementationModule = {
-  [key: string]: Implementation;
+  [key: string]: Implementation<any>;
 };
 
 /**
