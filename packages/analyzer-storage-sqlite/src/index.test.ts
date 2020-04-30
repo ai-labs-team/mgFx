@@ -11,10 +11,6 @@ import { sqlite } from './index';
 
 const unlink = promisify(_unlink);
 
-const filename = join(__dirname, 'mgfx-analyzer.sqlite');
-
-const connector = localConnector();
-
 const add = implement(
   define({
     name: 'add',
@@ -72,37 +68,43 @@ const couldFail = implement(
   (val) => (shouldFail ? reject('nope') : val)
 );
 
-const analyzer = makeAnalyzer({ storage: sqlite({ filename }) });
+const prepareSuite = (name: string) => {
+  const filename = join(__dirname, `mgfx-analyzer-${name}.sqlite`);
+
+  const tryCleanup = async () => {
+    try {
+      await unlink(filename);
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+    }
+  };
+
+  beforeAll(tryCleanup);
+  afterAll(tryCleanup);
+
+  return filename;
+};
+
+const connector = localConnector();
+const analyzer = makeAnalyzer({
+  storage: sqlite({ filename: prepareSuite('default') }),
+});
 connector.serveModule({ add, sum, div, avg, couldFail });
 connector.use(analyzer.collector);
 
 const ctx = connector.createContext({ isTest: true });
 
-const tryCleanup = async () => {
-  try {
-    await unlink(filename);
-  } catch (err) {
-    if (err.code !== 'ENOENT') {
-      throw err;
-    }
-  }
-};
-
-beforeAll(async () => {
-  await tryCleanup();
-
-  await ctx
-    .run(avg([1, 2, 3]))
-    .chain(after(100))
-    .and(ctx.run(div([1, 0])).alt(resolve(undefined)))
-    .promise();
-});
-
-afterAll(async () => {
-  await tryCleanup();
-});
-
 describe('query.spans', () => {
+  beforeAll(async () => {
+    await ctx
+      .run(avg([1, 2, 3]))
+      .chain(after(100))
+      .and(ctx.run(div([1, 0])).alt(resolve(undefined)))
+      .promise();
+  });
+
   it('selects all spans', async () => {
     const spans = await analyzer.query.spans({}).get().pipe(promise);
 
@@ -335,33 +337,40 @@ describe('query.spans', () => {
   });
 });
 
-it('supports writing events in buffered mode', (done) => {
+describe('buffered mode', () => {
   const bufferedAnalyzer = makeAnalyzer({
-    storage: sqlite({ filename }),
+    storage: sqlite({ filename: prepareSuite('buffered') }),
     buffer: { enabled: true },
   });
+
   const bufferedConnector = localConnector();
   bufferedConnector.use(bufferedAnalyzer.collector);
   bufferedConnector.serveModule({ add });
 
-  let updateCount = 0;
-  bufferedAnalyzer.query
-    .spans({})
-    .watch()
-    .observe((spans) => {
-      updateCount += 1;
-      if (spans.length === 0) {
-        return;
-      }
+  it('supports writing events in buffered mode', (done) => {
+    let updateCount = 0;
+    bufferedAnalyzer.query
+      .spans({})
+      .watch()
+      .observe((spans) => {
+        updateCount += 1;
+        if (spans.length === 0) {
+          return;
+        }
 
-      expect(updateCount).toBe(2);
-      done();
-    });
+        expect(updateCount).toBe(2);
+        done();
+      });
 
-  bufferedConnector
-    .run(add([1, 2]))
-    .and(bufferedConnector.run(add([3, 4])))
-    .and(bufferedConnector.run(add([5, 6])))
-    .and(bufferedConnector.run(add([7, 8])))
-    .promise();
+    bufferedConnector
+      .run(add([1, 2]))
+      .and(bufferedConnector.run(add([3, 4])))
+      .and(bufferedConnector.run(add([5, 6])))
+      .and(bufferedConnector.run(add([7, 8])))
+      .promise();
+  });
+
+  afterAll(() => {
+    bufferedAnalyzer.receiver.shutdown();
+  });
 });
