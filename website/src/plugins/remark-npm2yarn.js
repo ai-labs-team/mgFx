@@ -17,7 +17,8 @@ const transformNode = (node) => {
     {
       type: 'jsx',
       value:
-        `<Tabs groupId="package-manager"` +
+        `<Tabs groupId="package-manager" ` +
+        `defaultValue="npm" ` +
         `values={[
     { label: 'npm', value: 'npm', },
     { label: 'Yarn', value: 'yarn', },
