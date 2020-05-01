@@ -40,9 +40,15 @@ jobs:
         if: matrix.node-version == '14.x' && github.ref == 'refs/heads/beta'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GIT_USER: wms
+          GIT_EMAIL: warren@fountainhead.tech
         run: |
           echo "registry=http://registry.npmjs.org/" >> .npmrc
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+
+          git config --global user.name "$GIT_USER"
+          git config --global user.email "$GIT_EMAIL"
+
           yarn lerna publish --yes --dist-tag beta
 
       - name: Make analyzer-gui .deb
