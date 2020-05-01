@@ -1,5 +1,6 @@
 {
   "name": "@mgfx/kitchen-sink",
+  "private": true,
   "description": "The 'kitchen sink' demo of all available mgFx packages",
   "version": "0.1.1",
   "author": "Warren Seymour <warren@fountainhead.tech>",
