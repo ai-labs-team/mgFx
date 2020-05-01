@@ -1,6 +1,6 @@
 <div align="center">
 
-![mgfx](./docs/logo.png 'mgfx')
+![mgfx](./website/static/img/logo.png 'mgfx')
 
 # mgFx: Managed Effects for JavaScript
 
@@ -24,7 +24,7 @@ import { define, implement } from 'mgfx';
 
 const greet = implement(
   define({ name: 'greet' }),
-  input => `Hello ${input.name}!`
+  (input) => `Hello ${input.name}!`
 );
 ```
 
@@ -36,15 +36,12 @@ import { localConnector } from 'mgfx';
 const mgFx = localConnector();
 ```
 
-4. Use the Scheduler to serve your Task implementation and run it:
+4. Tell your Connector to serve the Task implementation:
 
 ```typescript
 mgFx.serve(greet);
 
-mgFx
-  .run(greet({ name: 'World' }))
-  .pipe(promise)
-  .then(console.log);
+mgFx.run(greet({ name: 'World' })).value(console.log);
 
 // Logs: `Hello World!`
 ```
@@ -91,7 +88,7 @@ import { Inspector, singleProcess } from 'mgfx';
 const { scheduler } = singleProcess({
   tasks: [
     /* Your list of tasks... */
-  ]
+  ],
 });
 
 new Instrumenter({ scheduler });
