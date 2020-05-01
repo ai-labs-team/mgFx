@@ -1,8 +1,8 @@
 module.exports = {
   title: 'mgFx',
   tagline: 'Managed Effects for JavaScript',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://ai-labs-team.github.io',
+  baseUrl: '/mgFx',
   favicon: 'img/favicon.ico',
   organizationName: 'ai-labs-team',
   projectName: 'mgFx',

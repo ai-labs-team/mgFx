@@ -1,0 +1,36 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - beta
+      # TODO: beta branch and tags only
+      - docs
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy-docs:
+    name: Build & Deploy Docs
+
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node v14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: website
+
+      - name: Build
+        run: yarn build
+        working-directory: website
+
+      - name: Deploy
+        run: yarn deploy
+        working-directory: website
