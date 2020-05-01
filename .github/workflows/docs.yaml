@@ -3,9 +3,7 @@ name: docs
 on:
   push:
     branches:
-      - beta
-    tags:
-      - '*'
+      - master
 
 jobs:
   build-and-deploy-docs:
@@ -39,3 +37,4 @@ jobs:
           git config --global user.email "$GIT_EMAIL"
           echo "machine github.com login $GIT_USER password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
           yarn deploy
+      # TODO: Deploy 'beta' docs
