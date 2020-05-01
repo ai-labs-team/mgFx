@@ -37,7 +37,7 @@ jobs:
         run: yarn test
 
       - name: Publish Packages (Beta Channel)
-        if: matrix.node-version == '14.x' && github.ref == 'refs/heads/master'
+        if: matrix.node-version == '14.x' && github.ref == 'refs/heads/beta'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
