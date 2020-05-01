@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - beta
-      # TODO: beta branch and tags only
-      - docs
     tags:
       - '*'
 
