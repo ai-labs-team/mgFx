@@ -36,6 +36,15 @@ jobs:
       - name: Test
         run: yarn test
 
+      - name: Publish Packages (Beta Channel)
+        if: matrix.node-version == '14.x' && github.ref == 'refs/heads/master'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "registry=http://registry.npmjs.org/" >> .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          lerna publish --yes --dist-tag beta
+
       - name: Make analyzer-gui .deb
         if: matrix.node-version == '14.x'
         run: yarn make:deb
