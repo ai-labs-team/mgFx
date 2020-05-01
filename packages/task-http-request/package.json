@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/task-http-request",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "A generic mgFx task definition to perform HTTP requests using Axios",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,10 +22,10 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "@mgfx/validator-iots": "^0.2.9",
+    "@mgfx/validator-iots": "^0.2.10",
     "axios": "^0.19.2",
     "bull": "^3.13.0",
-    "mgfx": "^0.6.3",
+    "mgfx": "^0.6.4",
     "ts-custom-error": "^3.1.1"
   },
   "jest": {
