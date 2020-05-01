@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-storage-sqlite",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "sqlite-based storage for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,15 +22,15 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "devDependencies": {
-    "@mgfx/analyzer": "^1.2.2",
+    "@mgfx/analyzer": "^1.2.3",
     "@types/better-sqlite3": "^5.4.0"
   },
   "dependencies": {
-    "@mgfx/codecs": "0.2.1",
+    "@mgfx/codecs": "^0.2.2",
     "better-sqlite3": "^6.0.1",
     "better-sqlite3-helper": "^2.3.0",
     "knex": "^0.20.10",
-    "mgfx": "^0.6.2",
+    "mgfx": "^0.6.3",
     "sql-template-strings": "^2.2.2"
   },
   "jest": {

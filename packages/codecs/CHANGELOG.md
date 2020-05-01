@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.2.2 (2020-05-01)
+
+**Note:** Version bump only for package @mgfx/codecs
+
+
+
+
+
 ## [0.2.1](https://github.com/ai-labs-team/mgFx/compare/@mgfx/codecs@0.2.0...@mgfx/codecs@0.2.1) (2020-03-11)
 
 **Note:** Version bump only for package @mgfx/codecs

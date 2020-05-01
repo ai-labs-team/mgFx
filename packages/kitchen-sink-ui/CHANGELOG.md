@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.2.16 (2020-05-01)
+
+**Note:** Version bump only for package @mgfx/kitchen-sink-ui
+
+
+
+
+
 ## [0.2.15](https://github.com/ai-labs-team/mgFx/compare/@mgfx/kitchen-sink-ui@0.2.14...@mgfx/kitchen-sink-ui@0.2.15) (2020-04-08)
 
 **Note:** Version bump only for package @mgfx/kitchen-sink-ui
