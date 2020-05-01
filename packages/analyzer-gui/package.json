@@ -1,7 +1,7 @@
 {
   "name": "mgfx-analyzer-gui",
   "private": true,
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "A Desktop client for analyzing mgFx applications",
   "main": ".webpack/main",
   "scripts": {
@@ -101,7 +101,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.24.0",
     "@electron-forge/maker-dmg": "^6.0.0-beta.51",
-    "@mgfx/analyzer-http-client": "^0.3.19",
+    "@mgfx/analyzer-http-client": "^0.3.20",
     "@react-hook/throttle": "^1.0.12",
     "@types/classnames": "^2.2.10",
     "@types/ramda": "^0.26.44",
