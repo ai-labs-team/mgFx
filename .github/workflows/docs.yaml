@@ -24,13 +24,20 @@ jobs:
           node-version: 14.x
 
       - name: Install dependencies
-        run: yarn
         working-directory: website
+        run: yarn
 
       - name: Build
-        run: yarn build
         working-directory: website
+        run: yarn build
 
       - name: Deploy
-        run: yarn deploy
         working-directory: website
+        env:
+          GIT_USER: wms
+          GIT_EMAIL: warren@fountainhead.tech
+        run: |
+          git config --global user.name "$GIT_USER"
+          git config --global user.email "$GIT_EMAIL"
+          echo "machine github.com login $GIT_USER password $DOCS_DEPLOY_GITHUB_TOKEN" > ~/.netrc
+          yarn deploy
