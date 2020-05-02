@@ -4,6 +4,8 @@ title: Validation
 
 In the last chapter, we created a Task Definition that uses the built-in `mgFx.validate.void` Validator to express that our Task is void of Input or Output. Let's take a moment to 'poke' at this Definition some more to learn about how mgFx enforces your constraints at both design-time and run-time.
 
+## Testing the limits
+
 First, attempt to violate the Input constraint at design-time by specifying a parameter when running the Task:
 
 ```typescript
@@ -37,7 +39,7 @@ OutputValidationError:
 
 By being consistently strict about types, mgFx applications are very robust. This is especially true for applications which involve interacting with data provided by third parties over which you have little or no control -- "Hell is other people('s data)."
 
-## Validation in Depth
+## Validation Functions
 
 If you examine the Validators that are built into the mgFx core, you will that they only offer validation of simple types - strings, numbers and `void`. Any 'real' application is going to require far more than this; indeed, the mgFx core only provides these validators as a means of getting up-and-running quickly.
 
@@ -83,3 +85,13 @@ mgFx.define({
   ),
 });
 ```
+
+## Conclusions
+
+In this chapter we covered:
+
+- How mgFx enforces Input/Output type constraints at design- and run-time.
+- How mgFx is relatively unopinionated about how these constraints are expressed.
+- How one may construct Tasks with constraints of arbitrary complexity.
+
+In the next chapter, we'll look at how to handle asyncronous behaviour in and around Tasks.
