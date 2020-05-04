@@ -1,8 +1,16 @@
 ---
-title: Futures & Asyncronous Behaviour
+title: Futures
 ---
 
-So far, the simple `sayHello` task that we've been working on returns a value _synchronously_. However, communication with the outside world (or even outside of the same OS Process) is rarely able to do so. Instead, we need a way for Tasks to be to operate in a non-blocking, _asynchronous manner_.
+By now, you should be comfortable with the fundamental components of mgFx, and how to _define_ a Task with certain Input/Output types.
+
+In this chapter, we shall explore how _asyncronous_ behaviour is handled in mgFx:
+
+- How and why mgFx uses Futures to handle async. behaviour.
+- A primer on what Futures are.
+- Some quick tips for newcomers on dealing with Futures.
+
+So far, the simple `sayHello` task that we've been working on returns a value _synchronously_. However, communication with the outside world (or even outside of the same OS Process) is rarely like this. Instead, we need a way for Tasks to be to operate in a non-blocking, _asynchronous manner_.
 
 ## Enter Futures
 
@@ -78,6 +86,66 @@ However, many programmers find this syntax a little more cumbersome to work with
 ```typescript file=./futures-3.ts
 ```
 
-This above example touches on a powerful feature of mgFx; that of _Task Composition_. However, understanding this concept requires a rudimentary understanding of Futures and some very general patterns and use-cases, which will outline next.
+This above example touches on a powerful feature of mgFx; that of _Task Composition_. However, understanding this concept requires a rudimentary understanding of Futures and some very general patterns and use-cases, which we will outline next.
 
-## Patterns, Pitfalls and Tips
+## Tips for newcomers
+
+By now, many JavaScript programmers who write asyncronous code are already familiar with the `Promise`, and potentially even the newer `async/await` syntax. Considering this, here are some tips for those that are experienced with Promises but unfamiliar with Futures:
+
+### `Future#map` and `Future#chain`
+
+Once the most appealing features of Promises is that a `.then()` callback may return a 'plain' value, or another Promise. This allows you to either:
+
+- _map_ over the value the Promise resolved to.
+- _chain_ the outcome of one Promise to the start of another.
+
+Although convenient, this 'two-in-one' API may sometimes be limiting; for example if you wanted a Promise that could resolve to _another Promise_. Instead, Futures offer two distinct operations:
+
+- `Future#map(mapFn)`
+
+  _map_ over the value resolved by a Future, returning a transformed value synchronously.
+
+- `Future#chain(mapFn)`
+
+  _chain_ one Future to another, by taking the value resolved by the prior Future and using it to return _another Future_.
+
+```typescript file=./futures-4.ts
+```
+
+### Concurrency
+
+Concurrent operations are typically modelled using `Promise.all`. The Future analogue to this is `Fluture.parallel`:
+
+```typescript file=./futures-5.ts
+```
+
+### Promise interop
+
+Fluture offers three ways of allowing Promise- and Future-based code to inter-operate:
+
+- `Future#promise()`
+
+  Acts as a replacement for `Future#fork()` -- it begins execution of the Future, and returns a Promise that will settle with the outcome of that Future.
+
+  However, one should use this with caution as it does _not_ provide any means of cancelling the Future, unlike `fork`, which returns a cancellation function.
+
+- `Future#encaseP()`
+
+  'Encases' a Promise-returning, unary function so that it becomes a Future-returning function:
+
+- `Future#attemptP()`
+
+  Uses the callback provided to create a Future from a Promise. The callback will only be called once the Future begins executing via `fork` or similar:
+
+  ```typescript file=./futures-6.ts
+  ```
+
+## Conclusions
+
+In this chapter we covered:
+
+- How mgFx uses Futures to encapsulate asynchronous behaviour in Task Implementations and when running a Task.
+- How mgFx uses a fluent interface to make Futures easier to work with.
+- Some tips on working with Futures to get you started.
+
+Armed with this knowledge, we can proceed to the next chapter, where we'll look at the various ways of _composing Tasks_.

@@ -2,7 +2,14 @@
 title: Validation
 ---
 
-In the last chapter, we created a Task Definition that uses the built-in `mgFx.validate.void` Validator to express that our Task is void of Input or Output. Let's take a moment to 'poke' at this Definition some more to learn about how mgFx enforces your constraints at both design-time and run-time.
+In the last chapter, we created a Task Definition that used the built-in `mgFx.validate.string` Validator to describe the 'contract' (in terms of Input and Output types) of a Task.
+
+In this chapter, we shall explore the concept in a little more detail:
+
+- Exploring how mgFx enforces this 'contract' at both design- and run-time
+- How to express more complicated types than what the core supports.
+
+We'll start out by 'poking' at the `sayHello` Task that we wrote in the previous chapter, and find ways of breaking it.
 
 ## Testing the limits
 
