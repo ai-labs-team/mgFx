@@ -4,6 +4,12 @@ title: Getting Started
 
 This guide will demonstrate the key concepts of mgFx and how to make use of them. We'll introduce and examine each set of concepts in each chapter, starting with the basics.
 
+In this first chapter we shall:
+
+- Initialize a TypeScript-based project with the mgFx core installed.
+- Create an mgFx Connector, Task Definition/Implementation, wire them together and try them out.
+- Give an introduction to each of these components and some of mgFx's functionality.
+
 ## Project Setup
 
 First, let's set up a brand new NodeJS application:
