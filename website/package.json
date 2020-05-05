@@ -17,7 +17,6 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "remark-code-import": "^0.2.0",
-    "remark-mermaid": "^0.2.0",
     "typedoc": "^0.17.6",
     "typescript": "^3.8.3"
   },

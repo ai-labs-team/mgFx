@@ -1,8 +1,12 @@
+const { join } = require('path');
+
+const baseUrl = '/mgFx/';
+
 module.exports = {
   title: 'mgFx',
   tagline: 'Managed Effects for JavaScript',
   url: 'https://ai-labs-team.github.io',
-  baseUrl: '/mgFx/',
+  baseUrl,
   favicon: 'img/favicon.ico',
   organizationName: 'ai-labs-team',
   projectName: 'mgFx',
@@ -76,7 +80,13 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/ai-labs-team/mgFx/edit/master/website/',
           remarkPlugins: [
-            require('remark-mermaid'),
+            [
+              require('./src/plugins/remark-mermaid/src/index'),
+              {
+                destinationDir: join(__dirname, 'static', 'diagrams'),
+                prefix: `${baseUrl}/diagrams/`,
+              },
+            ],
             require('remark-code-import'),
             require('./src/plugins/remark-npm2yarn'),
           ],
