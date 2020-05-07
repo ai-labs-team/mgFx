@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.2.13 (2020-05-07)
+
+**Note:** Version bump only for package @mgfx/validator-iots
+
+
+
+
+
 ## 0.2.12 (2020-05-05)
 
 **Note:** Version bump only for package @mgfx/validator-iots

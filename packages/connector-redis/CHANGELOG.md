@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.21 (2020-05-07)
+
+**Note:** Version bump only for package @mgfx/connector-redis
+
+
+
+
+
 ## 0.1.20 (2020-05-05)
 
 **Note:** Version bump only for package @mgfx/connector-redis
