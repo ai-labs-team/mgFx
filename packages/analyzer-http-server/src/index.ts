@@ -144,20 +144,22 @@ const toResponse = (res: Response, next: NextFunction) =>
 
 export type Config = {
   analyzer: Analyzer;
+  collector?: Partial<{
+    enabled: boolean;
+    sizeLimit: string | number;
+  }>;
 };
 
 export const httpServer = (config: Config) => {
-  const { analyzer } = config;
-  const router = Router();
+  const {
+    analyzer,
+    collector = {
+      enabled: true,
+    },
+  } = config;
 
-  return router
+  let router = Router()
     .use(compression())
-    .use(bodyParser.json())
-    .post('/collector', (req, res, next) => {
-      decodeBody(req, event)
-        .pipe(map(event => analyzer.receiver(event)))
-        .pipe(toResponse(res, next));
-    })
     .get('/query/spans', (req, res, next) => {
       decodeQuery(req, queryParams.spans)
         .pipe(chain(params => analyzer.query.spans(params).get()))
@@ -186,6 +188,21 @@ export const httpServer = (config: Config) => {
           });
         })
       );
-    })
-    .use(errorHandler());
+    });
+
+  if (collector.enabled) {
+    router = router.post(
+      '/collector',
+      bodyParser.json({ limit: collector.sizeLimit }),
+      (req, res, next) => {
+        decodeBody(req, event)
+          .pipe(map((event) => analyzer.receiver(event)))
+          .pipe(toResponse(res, next));
+      }
+    );
+  }
+
+  router = router.use(errorHandler());
+
+  return router;
 };
