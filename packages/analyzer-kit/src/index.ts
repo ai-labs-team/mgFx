@@ -19,6 +19,10 @@ const config = {
   http: {
     port: process.env.ANALYZER_HTTP_PORT || 8080,
   },
+  collector: {
+    enabled: process.env.ANALYZER_COLLECTOR_ENABLED !== 'false',
+    sizeLimit: process.env.ANALYZER_COLLECTOR_SIZE_LIMIT || '100kb',
+  },
 };
 
 const buffer =
@@ -39,6 +43,7 @@ express()
         }),
         buffer,
       }),
+      collector: config.collector,
     })
   )
   .listen(config.http.port, () => {
@@ -49,4 +54,7 @@ express()
       console.info(`  Buffer size: ${buffer.count} events`);
       console.info(`  Buffer time: ${buffer.time} ms`);
     }
+
+    console.info(`Collector: ${config.collector.enabled}`);
+    console.info(`  Size limit: ${config.collector.sizeLimit}`);
   });
