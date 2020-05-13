@@ -24,7 +24,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "fluenture": "^1.0.0",
+    "fluenture": "^2.0.0",
     "fluture": "^12.2.0",
     "ts-custom-error": "^3.1.1",
     "uuidv4": "^6.0.2"

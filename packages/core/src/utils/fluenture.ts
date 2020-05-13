@@ -28,6 +28,11 @@ export declare class Fluenture<A, B> {
 
   public ap<C>(future: Future<A, (value: B) => C>): Fluent<A, C>;
 
+  public bichain<C, D, E, F>(
+    withLeft: (left: A) => Future<C, D>,
+    withRight: (right: B) => Future<E, F>
+  ): Fluent<C | E, D | F>;
+
   public bimap<C, D>(
     withLeft: (left: A) => C,
     withRight: (right: B) => D
