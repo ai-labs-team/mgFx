@@ -1,6 +1,8 @@
 import { Event, makeInstrumenter } from 'mgfx/dist/middleware/instrumenter';
-import { Analyzer } from '@mgfx/analyzer';
+import { Analyzer, Span } from '@mgfx/analyzer';
 import { value } from '@mgfx/codecs';
+import copy from 'fast-copy';
+import { patch } from 'jsondiffpatch';
 import { map, chain, encaseP, fork } from 'fluture';
 import { stream } from 'kefir';
 
@@ -8,10 +10,11 @@ export type Config = {
   baseUrl: string;
   fetch: typeof fetch;
   EventSource: typeof EventSource;
+  watchDeltas?: boolean;
 };
 
 export const httpClient = (config: Config): Analyzer => {
-  const { baseUrl, fetch, EventSource } = config;
+  const { baseUrl, fetch, EventSource, watchDeltas = false } = config;
 
   const receiver = Object.assign(
     (event: Event) => {
@@ -34,28 +37,54 @@ export const httpClient = (config: Config): Analyzer => {
     collector: makeInstrumenter({ receiver }),
 
     query: {
-      spans: params => {
+      spans: (params) => {
         const url = `${baseUrl}/query/spans`;
         const paramsF = value.encode(params).pipe(map(encodeURIComponent));
 
         return {
           get: () =>
             paramsF
-              .pipe(chain(encaseP(params => fetch(`${url}?q=${params}`))))
-              .pipe(chain(encaseP(response => response.json()))),
+              .pipe(chain(encaseP((params) => fetch(`${url}?q=${params}`))))
+              .pipe(chain(encaseP((response) => response.json()))),
 
           watch: () =>
-            stream(emitter => {
+            stream((emitter) => {
               let eventSource: EventSource;
 
               const cancel = paramsF.pipe(
-                fork(console.error)(params => {
-                  eventSource = new EventSource(`${url}/observe?q=${params}`);
-                  eventSource.addEventListener('message', message => {
-                    emitter.emit(JSON.parse(message.data));
+                fork(console.error)((params) => {
+                  eventSource = new EventSource(
+                    `${url}/observe?q=${params}&deltas=${watchDeltas}`
+                  );
+
+                  let prevState: Span[] = [];
+
+                  eventSource.addEventListener('message', (message) => {
+                    try {
+                      prevState = JSON.parse(message.data);
+                    } catch (err) {
+                      emitter.error(err);
+                      return;
+                    }
+
+                    emitter.emit(prevState);
                   });
 
-                  eventSource.addEventListener('error', error => {
+                  if (watchDeltas) {
+                    eventSource.addEventListener('delta', (message: any) => {
+                      try {
+                        const delta = JSON.parse(message.data);
+                        prevState = patch(copy(prevState), delta);
+                      } catch (err) {
+                        emitter.error(err);
+                        return;
+                      }
+
+                      emitter.emit(prevState);
+                    });
+                  }
+
+                  eventSource.addEventListener('error', (error) => {
                     emitter.error(error);
                   });
                 })
@@ -68,9 +97,9 @@ export const httpClient = (config: Config): Analyzer => {
                   eventSource.close();
                 }
               };
-            })
+            }),
         };
-      }
-    }
+      },
+    },
   };
 };
