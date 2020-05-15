@@ -15,14 +15,14 @@ import { httpServer } from './index';
 const unlink = promisify(_unlink);
 
 const analyzer = makeAnalyzer({
-  storage: sqlite({})
+  storage: sqlite({}),
 });
 const connector = localConnector();
 connector.use(analyzer.collector);
 
 const greet = implement(
   define({ name: 'greet', input: ioTs(t.string), output: ioTs(t.string) }),
-  name => {
+  (name) => {
     if (name.startsWith('_')) {
       return reject(new Error(`Invalid name ${name}`));
     }
@@ -37,7 +37,7 @@ const app = express();
 app.use(
   '/analyzer',
   httpServer({
-    analyzer
+    analyzer,
   })
 );
 
@@ -55,14 +55,14 @@ describe('/collector', () => {
         kind: 'process',
         process: {
           spec: {
-            name: 'test'
+            name: 'test',
           },
           id: 'test-1',
-          input: 'hello'
-        }
+          input: 'hello',
+        },
       });
 
-    await new Promise(resolve => setTimeout(() => resolve(), 200));
+    await new Promise((resolve) => setTimeout(() => resolve(), 200));
 
     const runningResponse = await request(app)
       .get('/analyzer/query/spans')
@@ -75,12 +75,12 @@ describe('/collector', () => {
         createdAt: 1,
         process: {
           spec: {
-            name: 'test'
-          }
+            name: 'test',
+          },
         },
         input: 'hello',
-        state: 'running'
-      }
+        state: 'running',
+      },
     ]);
 
     await request(app)
@@ -90,10 +90,10 @@ describe('/collector', () => {
         timestamp: 2,
         kind: 'resolution',
         id: 'test-1',
-        value: 'world'
+        value: 'world',
       });
 
-    await new Promise(resolve => setTimeout(() => resolve(), 200));
+    await new Promise((resolve) => setTimeout(() => resolve(), 200));
 
     const resolvedResponse = await request(app)
       .get('/analyzer/query/spans')
@@ -107,13 +107,13 @@ describe('/collector', () => {
         endedAt: 2,
         process: {
           spec: {
-            name: 'test'
-          }
+            name: 'test',
+          },
         },
         input: 'hello',
         state: 'resolved',
-        output: 'world'
-      }
+        output: 'world',
+      },
     ]);
   });
 });
@@ -130,13 +130,13 @@ describe('/query/spans', () => {
     expect(response.body).toEqual([]);
   });
 
-  it('responds with a populated list of spans', done => {
+  it('responds with a populated list of spans', (done) => {
     let processId: string;
     expect.assertions(2);
 
     greet('World')
       .pipe(
-        map(process => {
+        map((process) => {
           processId = process.id;
           return process;
         })
@@ -158,10 +158,10 @@ describe('/query/spans', () => {
           state: 'running',
           process: {
             spec: {
-              name: 'greet'
-            }
-          }
-        }
+              name: 'greet',
+            },
+          },
+        },
       ]);
     }, 50);
 
@@ -181,10 +181,10 @@ describe('/query/spans', () => {
           output: 'Hello World!',
           process: {
             spec: {
-              name: 'greet'
-            }
-          }
-        }
+              name: 'greet',
+            },
+          },
+        },
       ]);
 
       done();
@@ -193,7 +193,7 @@ describe('/query/spans', () => {
 });
 
 describe('/query/spans/observe', () => {
-  it('sends an update for every change', done => {
+  it('sends an update for every change', (done) => {
     let processId: string;
     let req: any;
 
@@ -204,7 +204,7 @@ describe('/query/spans/observe', () => {
 
     let n = 0;
     const fakeStream = new PassThrough();
-    fakeStream.on('data', message => {
+    fakeStream.on('data', (message) => {
       const data = extract(message.toString());
       if (n === 0) {
         n += 1;
@@ -221,10 +221,10 @@ describe('/query/spans/observe', () => {
             state: 'running',
             process: {
               spec: {
-                name: 'greet'
-              }
-            }
-          }
+                name: 'greet',
+              },
+            },
+          },
         ]);
       }
 
@@ -239,10 +239,10 @@ describe('/query/spans/observe', () => {
             output: 'Hello World!',
             process: {
               spec: {
-                name: 'greet'
-              }
-            }
-          }
+                name: 'greet',
+              },
+            },
+          },
         ]);
 
         done();
@@ -251,7 +251,7 @@ describe('/query/spans/observe', () => {
 
     greet('World')
       .pipe(
-        map(process => {
+        map((process) => {
           processId = process.id;
 
           request(app)
@@ -265,5 +265,88 @@ describe('/query/spans/observe', () => {
       .pipe(chain(after(100)))
       .pipe(connector.run)
       .pipe(fork.toBackground);
+  });
+
+  describe('when `deltas` query param is set', () => {
+    it('sends an initial full update, followed by deltas', (done) => {
+      let processId: string;
+      let req: any;
+
+      expect.assertions(5);
+
+      const extract = (message: string) =>
+        JSON.parse(message.replace('data: ', ''));
+
+      let n = 0;
+      const fakeStream = new PassThrough();
+      fakeStream.on('data', (message) => {
+        if (n === 0) {
+          n += 1;
+          const data = extract(message.toString());
+          return expect(data).toEqual([]);
+        }
+
+        if (n === 1) {
+          n += 1;
+          const lines = message.toString().split('\n');
+          expect(lines[0]).toEqual('event: delta');
+
+          const data = extract(lines[1].toString());
+          return expect(data).toEqual({
+            _t: 'a',
+            0: [
+              {
+                createdAt: expect.any(Number),
+                id: processId,
+                input: 'World',
+                state: 'running',
+                process: {
+                  spec: {
+                    name: 'greet',
+                  },
+                },
+              },
+            ],
+          });
+        }
+
+        if (n === 2) {
+          const lines = message.toString().split('\n');
+          expect(lines[0]).toEqual('event: delta');
+          const data = extract(lines[1].toString());
+
+          expect(data).toEqual({
+            _t: 'a',
+            0: {
+              endedAt: [expect.any(Number)],
+              output: ['Hello World!'],
+              state: ['running', 'resolved'],
+            },
+          });
+
+          done();
+        }
+      });
+
+      greet('World')
+        .pipe(
+          map((process) => {
+            processId = process.id;
+
+            request(app)
+              .get('/analyzer/query/spans/observe')
+              .query({
+                q: JSON.stringify({ v: { scope: { id: process.id } } }),
+                deltas: true,
+              })
+              .pipe(fakeStream);
+
+            return process;
+          })
+        )
+        .pipe(chain(after(100)))
+        .pipe(connector.run)
+        .pipe(fork.toBackground);
+    });
   });
 });
