@@ -3,6 +3,7 @@ import { SpanParameters } from '@mgfx/analyzer';
 
 export type Server = {
   baseUrl: string;
+  deltas?: boolean;
 };
 
 export type Schema = {
@@ -42,11 +43,16 @@ export const config = new Store<Schema>({
       items: {
         type: 'object',
         properties: {
+          deltas: {
+            type: 'boolean',
+            default: true
+          },
           baseUrl: {
             type: 'string',
             format: 'uri',
           },
         },
+        required: ['baseUrl']
       },
       default: [],
     },
