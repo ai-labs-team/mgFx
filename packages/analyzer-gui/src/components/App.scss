@@ -60,3 +60,9 @@ body {
   height: calc(100vh - #{$pt-navbar-height});
   position: relative;
 }
+
+.bp3-control {
+  .bp3-icon-help {
+    margin-left: $pt-grid-size / 2;
+  }
+}

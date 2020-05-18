@@ -39,6 +39,8 @@
   "dependencies": {
     "@mgfx/codecs": "^0.2.7",
     "@types/kefir": "^3.8.2",
+    "fast-copy": "^2.0.5",
+    "jsondiffpatch": "^0.4.1",
     "kefir": "^3.8.6",
     "mgfx": "^0.6.8",
     "qs": "^6.9.1"

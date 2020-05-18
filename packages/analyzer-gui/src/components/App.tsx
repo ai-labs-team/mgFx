@@ -35,8 +35,9 @@ const App: React.FC = () => {
       selectedServer
         ? httpClient({
             baseUrl: selectedServer.baseUrl,
+            watchDeltas: selectedServer.deltas,
             fetch,
-            EventSource
+            EventSource,
           })
         : undefined,
     [selectedServer]

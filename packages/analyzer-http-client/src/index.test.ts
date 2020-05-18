@@ -3,7 +3,7 @@ import { httpServer } from '@mgfx/analyzer-http-server';
 import { sqlite } from '@mgfx/analyzer-storage-sqlite';
 import { ioTs, t } from '@mgfx/validator-iots';
 import express from 'express';
-import { after, promise } from 'fluture';
+import { after, chain, promise } from 'fluture';
 import fetch from 'node-fetch';
 import EventSource from 'eventsource';
 import { Server } from 'http';
@@ -22,7 +22,7 @@ const analyzer = makeAnalyzer({ storage: sqlite({}) });
 const client = httpClient({
   baseUrl: 'http://localhost:8081',
   fetch: fetch as any,
-  EventSource: EventSource as any
+  EventSource: EventSource as any,
 });
 
 connector.use(client.collector);
@@ -32,7 +32,7 @@ const add = implement(
   define({
     name: 'add',
     input: ioTs(t.tuple([t.number, t.number])),
-    output: ioTs(t.number)
+    output: ioTs(t.number),
   }),
   ([a, b]) => after(100)(a + b)
 );
@@ -41,14 +41,14 @@ connector.serve(add);
 
 const start = () =>
   new Promise<Server>((resolve, reject) => {
-    const server = app.listen(8081, err => {
+    const server = app.listen(8081, (err) => {
       err ? reject(err) : resolve(server);
     });
   });
 
 const stop = (server: Server) =>
   new Promise((resolve, reject) => {
-    server.close(err => (err ? reject(err) : resolve()));
+    server.close((err) => (err ? reject(err) : resolve()));
   });
 
 let server: Server;
@@ -64,10 +64,7 @@ afterAll(async () => {
 });
 
 it('performs a `get` query', async () => {
-  const result = await client.query
-    .spans({})
-    .get()
-    .pipe(promise);
+  const result = await client.query.spans({}).get().pipe(promise);
 
   expect(result).toHaveLength(1);
   expect(result[0].process.spec.name).toBe('add');
@@ -77,15 +74,29 @@ it('performs a `get` query', async () => {
 });
 
 it('performs a `watch` query', async () => {
-  const result = await client.query
-    .spans({})
-    .watch()
-    .take(1)
-    .toPromise();
+  const result = await client.query.spans({}).watch().take(1).toPromise();
 
   expect(result).toHaveLength(1);
   expect(result[0].process.spec.name).toBe('add');
   expect(result[0].input).toEqual([1, 2]);
   expect(result[0].state).toBe('resolved');
   expect((result[0] as any).output).toBe(3);
+});
+
+it('replays deltas when enabled', async () => {
+  const deltaClient = httpClient({
+    baseUrl: 'http://localhost:8081',
+    fetch: fetch as any,
+    EventSource: EventSource as any,
+    watchDeltas: true,
+  });
+
+  const result = client.query.spans({}).watch().take(3).toPromise();
+  const deltaResult = deltaClient.query.spans({}).watch().take(3).toPromise();
+
+  await after(100)(undefined)
+    .pipe(chain(() => connector.run(add([3, 4]))))
+    .pipe(promise);
+
+  expect(await result).toEqual(await deltaResult);
 });
