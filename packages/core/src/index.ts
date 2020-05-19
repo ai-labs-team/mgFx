@@ -14,6 +14,7 @@ export const fork = {
 };
 
 export const validate = {
+  any: resolve as Validator<any>,
   void: (() => resolve(undefined)) as Validator<void>,
   string: ((value: unknown) =>
     typeof value === 'string'

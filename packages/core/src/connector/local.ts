@@ -7,11 +7,18 @@ import { CustomError } from 'ts-custom-error';
 import {
   makeConnector,
   EncasedImplementationFunction,
-  EnvironmentInitializer
+  EnvironmentInitializer,
 } from '../connector';
-import { Spec } from '../task';
 
-export class NoImplementationError extends CustomError {}
+import { Process, Spec } from '../task';
+
+export class NoImplementationError extends CustomError {
+  constructor(public readonly process: Process) {
+    super(
+      `No Implementation for ${process.spec.name} was found. Did you forget to call serve()?`
+    );
+  }
+}
 
 export const local = () => {
   const implementations = new Map<
@@ -20,14 +27,10 @@ export const local = () => {
   >();
 
   return makeConnector({
-    dispatch: process => {
+    dispatch: (process) => {
       const match = implementations.get(process.spec);
       if (!match) {
-        return reject(
-          new NoImplementationError(
-            `No Implementation for ${process.spec.name} was found. Did you forget to call serve()?`
-          )
-        );
+        return reject(new NoImplementationError(process));
       }
 
       const [implementation, environmentInitializer] = match;
@@ -41,6 +44,6 @@ export const local = () => {
       return () => {
         implementations.delete(spec);
       };
-    }
+    },
   });
 };
