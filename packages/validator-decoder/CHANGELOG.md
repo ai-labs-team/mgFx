@@ -5,12 +5,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 0.0.2 (2020-05-19)
 
-**Note:** Version bump only for package @mgfx/testing
-
-
-
-
-
-## 0.0.1 (2020-05-19)
-
-**Note:** Version bump only for package @mgfx/testing
+**Note:** Version bump only for package @mgfx/validator-decoder

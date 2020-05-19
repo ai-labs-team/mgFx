@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/codecs",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Common (de)serializing functions for mgFx",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
