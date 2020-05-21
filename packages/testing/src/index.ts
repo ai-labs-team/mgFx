@@ -10,6 +10,7 @@ import {
   ImplementationFunction,
   Spec,
 } from 'mgfx/dist/task';
+import { Fluent } from 'mgfx/dist/utils/fluenture';
 
 import {
   bichain,
@@ -23,44 +24,46 @@ import {
 import { CustomError } from 'ts-custom-error';
 import fastEquals from 'fast-deep-equal';
 
+export type ExpectResolution<S extends Spec> = (
+  expected: InputOf<S>
+) => Fluent<ExpectedResolutionFailedError, void>;
+export type ExpectRejection = (
+  expected: any
+) => Fluent<ExpectedRejectionFailedError, void>;
+
 export const mockConnector = () => {
   const connector = localConnector();
 
-  const run = <I extends Implementation>(implementation: I) => {
-    connector.serve(implementation);
+  const self: MockInterface = {
+    run: (implementation) => {
+      connector.serve(implementation);
 
-    const withInput = (input: InputOf<I['spec']>) => {
-      const future = implementation(input).pipe((processF) =>
-        connector
-          .run(processF)
-          .pipe(matchUnmatchedRunChildError(implementation.spec, processF))
-      );
+      return {
+        withInput: (input) => {
+          const future = implementation(input).pipe((processF) =>
+            connector.run(processF).pipe(matchUnmatchedRunChildError(processF))
+          );
 
-      const expect = (expected: OutputOf<I['spec']>) =>
-        future.pipe(matchResolution(expected));
+          const resolution = (expected: any) =>
+            future.pipe(matchResolution(expected));
 
-      return Object.assign(future, {
-        expect: Object.assign(expect, {
-          resolution: expect,
-          rejection: (expected: any) => future.pipe(matchRejection(expected)),
-        }),
-      });
-    };
+          const rejection = (expected: any) =>
+            future.pipe(matchRejection(expected));
 
-    return { withInput };
+          const expect = Object.assign(resolution, { resolution, rejection });
+
+          return Object.assign(future, { expect });
+        },
+      };
+    },
+    stub: (definition) => ({
+      as: (implementation) => {
+        connector.serve(implement(definition, implementation));
+        return self;
+      },
+    }),
   };
 
-  const stub = <D extends Definition>(definition: D) => {
-    const as = (stub: ImplementationFunction<D['spec']>) => {
-      connector.serve(implement(definition, stub));
-
-      return self;
-    };
-
-    return { as };
-  };
-
-  const self = { run, stub };
   return self;
 };
 
@@ -83,7 +86,6 @@ export const matchRejection = (expected: any) =>
   );
 
 export const matchUnmatchedRunChildError = (
-  spec: Spec,
   processF: FutureInstance<any, Process>
 ) =>
   chainRej((reason: any) =>
@@ -134,3 +136,65 @@ export class UnmatchedRunChildError extends CustomError {
     );
   }
 }
+
+export type MockInterface = {
+  /**
+   * Instructs the Mock Connector which Task Implementation should be considered under test.
+   *
+   * @param implementation The Task Implementation to test.
+   */
+  run: <S extends Spec>(
+    implementation: Implementation<S>
+  ) => {
+    /**
+     * Instructs the Mock Connector what input should be given to the Task Implement under test.
+     *
+     * @param input The input to provide to the Task Implementation.
+     * @return A Fluent Future, with additional `.expect` utilities.
+     */
+    withInput: (
+      input: InputOf<S>
+    ) => Fluent<any, OutputOf<S>> & {
+      /**
+       * Allows access to `.resolution` and `.rejection` expectation helpers, and is also an alias for
+       * `.expect.resolution`, for convenience.
+       */
+      expect: ExpectResolution<S> & {
+        /**
+         * Asserts that the current Future _resolves_ with a value that is deeply equal according to
+         * `fast-deep-equal`.
+         *
+         * @param expected The expected resolution value of this Future.
+         */
+        resolution: ExpectResolution<S>;
+        /**
+         * Asserts that the current Future _rejects_ with a reason that is deeply equal according to
+         * `fast-deep-equal`.
+         *
+         * @param expected The expected rejection reason of this Future.
+         */
+        rejection: ExpectRejection;
+      };
+    };
+  };
+
+  /**
+   * Allows calls to `.runChild` within the Task Implementation under test to be 'stubbed'.
+   *
+   * @param definition The Task Definition that should be stubbed.
+   */
+  stub: <S extends Spec>(
+    definition: Definition<S>
+  ) => {
+    /**
+     * Allows the preceeding call to `.stub` to specify the mock implementation function to use.
+     *
+     * @param implementation A mock implementation function; it will receive the input given to the child task by the
+     * parent Task Implementation under test, and should return either a synchronous value, or a Future (this is
+     * ideal for tests which need to simulate failure.)
+     *
+     * @return The top-level fluent interface, so that more calls to `.stub()`, `.run()`, etc may be made.
+     */
+    as: (implementation: ImplementationFunction<S>) => MockInterface;
+  };
+};
