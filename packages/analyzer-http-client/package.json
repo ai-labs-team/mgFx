@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-http-client",
-  "version": "0.3.26",
+  "version": "0.3.27",
   "description": "HTTP-based Client for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,8 +22,8 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "devDependencies": {
-    "@mgfx/analyzer": "^1.2.11",
-    "@mgfx/analyzer-storage-sqlite": "^2.2.12",
+    "@mgfx/analyzer": "^1.2.12",
+    "@mgfx/analyzer-storage-sqlite": "^2.2.13",
     "@types/eventsource": "^1.1.2",
     "@types/node-fetch": "^2.5.5",
     "@types/qs": "^6.9.1",
@@ -37,12 +37,12 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@mgfx/codecs": "^0.2.10",
+    "@mgfx/codecs": "^0.2.11",
     "@types/kefir": "^3.8.2",
     "fast-copy": "^2.0.5",
     "jsondiffpatch": "^0.4.1",
     "kefir": "^3.8.6",
-    "mgfx": "^0.6.11",
+    "mgfx": "^0.6.12",
     "qs": "^6.9.1"
   },
   "publishConfig": {
