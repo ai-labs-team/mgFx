@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.25 (2020-06-03)
+
+**Note:** Version bump only for package @mgfx/express-middleware
+
+
+
+
+
 ## 0.1.24 (2020-05-21)
 
 **Note:** Version bump only for package @mgfx/express-middleware
