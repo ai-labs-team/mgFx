@@ -39,6 +39,7 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
 
   db.pragma('foreign_keys = OFF');
 
+  const getCachedValue = db.prepare(statements.getCachedValue);
   const cacheValue = db.prepare(statements.cacheValue);
   const updateSpan = db.prepare(statements.updateSpan);
   const putEventProcess = db.prepare(statements.putEventProcess);
@@ -46,14 +47,16 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
   const putEventResolution = db.prepare(statements.putEventResolution);
   const putEventCancellation = db.prepare(statements.putEventCancellation);
 
-  const putEvent = switchEvent<void, any>({
-    process: db.transaction((event: ProcessEvent, [input, context]) => {
-      cacheValue.run(input);
-      cacheValue.run(context);
+  const cachedValueId = (value: any) => {
+    const result = getCachedValue.get(value);
+    return result ? result.rowid : cacheValue.run(value).lastInsertRowid;
+  };
 
+  const putEvent = switchEvent<void, any>({
+    process: db.transaction((event: ProcessEvent, [input, contextValues]) => {
       putEventProcess.run({
-        input,
-        context,
+        inputId: cachedValueId(input),
+        contextValuesId: cachedValueId(contextValues),
         timestamp: event.timestamp,
         processSpecName: event.process.spec.name,
         processId: event.process.id,
@@ -66,22 +69,22 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
     }),
 
     rejection: db.transaction((event: RejectionEvent, reason) => {
-      cacheValue.run(reason);
       putEventRejection.run({
-        reason,
+        reasonId: cachedValueId(reason),
         timestamp: event.timestamp,
         id: event.id,
       });
+
       updateSpan.run(event.id);
     }),
 
     resolution: db.transaction((event: ResolutionEvent, value) => {
-      cacheValue.run(value);
       putEventResolution.run({
-        value,
+        valueId: cachedValueId(value),
         timestamp: event.timestamp,
         id: event.id,
       });
+
       updateSpan.run(event.id);
     }),
 
@@ -90,6 +93,7 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
         timestamp: event.timestamp,
         id: event.id,
       });
+
       updateSpan.run(event.id);
     }),
   });
