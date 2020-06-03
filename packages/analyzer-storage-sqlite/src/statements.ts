@@ -1,8 +1,15 @@
 /**
- * Inserts a value into the value cache if it doesn't already exist
+ * Gets a value from the value cache; returns an empty result set if it doesn't already exist
+ */
+export const getCachedValue = `
+SELECT rowid FROM value_cache WHERE content = ?
+`;
+
+/**
+ * Inserts a value into the value cache when it doesn't already exist
  */
 export const cacheValue = `
-INSERT OR IGNORE INTO value_cache VALUES (?);
+INSERT INTO value_cache VALUES (?);
 `;
 
 /**
@@ -19,8 +26,8 @@ INSERT INTO events_process (
   context_id,
   context_parent_id
 ) VALUES (
-  (SELECT rowid FROM value_cache WHERE content = $input),
-  (SELECT rowid FROM value_cache WHERE content = $context),
+  $inputId,
+  $contextValuesId,
   $timestamp,
   $processSpecName,
   $processId,
@@ -39,7 +46,7 @@ INSERT INTO events_resolution (
   timestamp,
   id
 ) VALUES (
-  (SELECT rowid FROM value_cache WHERE content = $value),
+  $valueId,
   $timestamp,
   $id
 )
@@ -54,7 +61,7 @@ INSERT INTO events_rejection (
   timestamp,
   id
 ) VALUES (
-  (SELECT rowid FROM value_cache WHERE content = $reason),
+  $reasonId,
   $timestamp,
   $id
 )
