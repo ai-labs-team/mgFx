@@ -64,14 +64,15 @@ const couldFail = implement(
 );
 
 const connector = localConnector();
-const analyzer = makeAnalyzer({
-  storage: postgresql({
-    database: 'postgres://postgres:password@localhost:5433/mgfx',
+const storage = postgresql({
+    database: process.env.POSTGRES_URL || 'postgres://postgres:password@localhost/mgfx',
     migrations: {
       force: true
     },
-  }),
 });
+
+const analyzer = makeAnalyzer({ storage });
+
 connector.serveModule({ add, sum, div, avg, couldFail });
 connector.use(analyzer.collector);
 
@@ -358,7 +359,7 @@ describe('query.spans', () => {
 describe('buffered mode', () => {
   const bufferedAnalyzer = makeAnalyzer({
     storage: postgresql({
-      database: 'postgres://postgres:password@localhost:5433/mgfx-buffered',
+      database: process.env.POSTGRES_URL || 'postgres://postgres:password@localhost/mgfx',
       migrations: {
         force: true,
       },

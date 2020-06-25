@@ -14,6 +14,14 @@ jobs:
         node-version: [10.x, 12.x, 14.x]
 
     services:
+      postgres:
+        image: postgres:12
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mgfx
+
       redis:
         image: redis
         ports:
