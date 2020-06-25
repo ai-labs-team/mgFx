@@ -15,7 +15,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsc -p tsconfig.json && cp -R src/migrations dist/migrations",
+    "build": "tsc -p tsconfig.json && rm dist/migrations/*.ts* && rm dist/migrations/*.js.map",
     "test": "jest"
   },
   "bugs": {
