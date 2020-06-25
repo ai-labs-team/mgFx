@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-http-server",
-  "version": "0.6.20",
+  "version": "0.6.21",
   "description": "HTTP-based Server for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,17 +22,17 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "@mgfx/codecs": "^0.2.14",
+    "@mgfx/codecs": "^0.2.15",
     "@warrenseymour/json-delta": "^1.0.2",
     "compression": "^1.7.4",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "jsondiffpatch": "^0.4.1",
-    "mgfx": "^0.6.15"
+    "mgfx": "^0.6.16"
   },
   "devDependencies": {
-    "@mgfx/analyzer": "^1.2.15",
-    "@mgfx/analyzer-storage-sqlite": "^2.2.16",
+    "@mgfx/analyzer": "^1.2.16",
+    "@mgfx/analyzer-storage-sqlite": "^2.2.17",
     "@types/compression": "^1.7.0",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"

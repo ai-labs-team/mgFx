@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.3.21 (2020-06-25)
+
+
+### Bug Fixes
+
+* **analyzer-storage-postgresql:** assume bigints are ints ([a507723](https://github.com/ai-labs-team/mgFx/commit/a507723))
+
+
+
+
+
 ## 0.3.20 (2020-06-25)
 
 
