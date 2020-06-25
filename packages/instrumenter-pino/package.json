@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/instrumenter-pino",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "description": "An mgFx instrumenter that uses Pino as a logging provider",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -21,7 +21,7 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "mgfx": "^0.6.13",
+    "mgfx": "^0.6.14",
     "pino": "^5.16.0"
   },
   "devDependencies": {
