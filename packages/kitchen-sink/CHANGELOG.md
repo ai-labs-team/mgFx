@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.13 (2020-06-25)
+
+
+### Bug Fixes
+
+* **analyzer-storage-postgresql:** apply limit/offset after recursion ([ca349f8](https://github.com/ai-labs-team/mgFx/commit/ca349f8))
+
+
+
+
+
 ## 0.1.12 (2020-06-25)
 
 **Note:** Version bump only for package @mgfx/kitchen-sink
