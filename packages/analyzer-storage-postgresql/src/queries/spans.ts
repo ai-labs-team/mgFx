@@ -23,6 +23,10 @@ export const buildQuery = (params: SpanParameters) => {
     query.where('state', params.scope.state);
   }
 
+  if (params.scope?.id) {
+    query = buildRecursiveQuery(query, params) as any;
+  }
+
   if (params.limit) {
     query.limit(params.limit);
   }
@@ -33,10 +37,6 @@ export const buildQuery = (params: SpanParameters) => {
 
   if (params.order) {
     query.orderBy(params.order.field, params.order.direction);
-  }
-
-  if (params.scope?.id) {
-    query = buildRecursiveQuery(query, params) as any;
   }
 
   return query;

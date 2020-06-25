@@ -228,6 +228,22 @@ describe('query.spans', () => {
     expect(spans).toHaveLength(6);
   });
 
+  it('selects all spans that descend from `id` with `limit`', async () => {
+    const [{ id }] = await analyzer.query
+      .spans({
+        scope: { spec: { name: 'avg' } },
+      })
+      .get()
+      .pipe(promise);
+
+    const spans = await analyzer.query
+      .spans({ scope: { id }, limit: 3 })
+      .get()
+      .pipe(promise);
+
+    expect(spans).toHaveLength(3);
+  });
+
   it('omits values if `compact` parameter is specified', async () => {
     const spans = await analyzer.query
       .spans({ compact: true })
