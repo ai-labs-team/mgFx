@@ -11,6 +11,8 @@ export const buildQuery = (params: SpanParameters) => {
   applyDistinct(query, params);
   applyWhereInput(query, params);
 
+  query.whereNotNull('createdAt');
+
   if (params.scope?.context?.id) {
     query.whereRaw(`context ->> 'id' = ?`, params.scope.context.id);
   }
