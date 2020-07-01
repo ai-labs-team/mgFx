@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/testing",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index.js",
   "license": "MIT",
   "files": [
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "fast-deep-equal": "3.1.1",
-    "mgfx": "^0.6.16"
+    "mgfx": "^0.6.17"
   },
   "jest": {
     "preset": "ts-jest",

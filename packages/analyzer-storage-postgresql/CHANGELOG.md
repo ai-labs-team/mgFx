@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.3.4 (2020-07-01)
+
+**Note:** Version bump only for package @mgfx/analyzer-storage-postgresql
+
+
+
+
+
 ## 2.3.3 (2020-06-25)
 
 
