@@ -2,7 +2,8 @@ import { fluent } from 'mgfx/dist/utils/fluenture';
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { ioTs, t } from '@mgfx/validator-iots';
 import { promise, resolve, after, reject } from 'fluture';
-import { localConnector, define, implement, validate } from 'mgfx';
+import { localConnector, define, implement } from 'mgfx';
+import { uuid } from 'uuidv4';
 
 import { postgresql } from './index';
 
@@ -80,17 +81,6 @@ const ctx = connector.createContext({ isTest: true });
 
 describe('query.spans', () => {
   beforeAll(async () => {
-    /**
-    for (let i = 10; i < 1000; i += 1) {
-      const xs = [];
-      for (let j = 0; j < i; j += 1) {
-        xs.push(j);
-      }
-
-      await ctx.run(avg(xs)).promise();
-    }
-    **/
-
     await ctx
       .run(avg([1, 2, 3]))
       .chain(after(100))
@@ -103,6 +93,22 @@ describe('query.spans', () => {
     const spans = await analyzer.query.spans({}).get().pipe(promise);
 
     expect(spans).toHaveLength(7);
+  });
+
+  it('does not select partial spans', async () => {
+    const id = uuid();
+    analyzer.receiver({
+      kind: 'resolution',
+      value: 'test',
+      timestamp: Date.now(),
+      id
+    });
+
+    await after(100)(undefined).pipe(promise);
+
+    const result = await analyzer.query.spans({ scope: { id } }).get().pipe(promise);
+
+    expect(result).toEqual([]);
   });
 
   it('selects all spans in a given context', async () => {
