@@ -1,12 +1,11 @@
 import { deepEqual } from 'fast-equals';
 import { Emitter, Stream, stream as _stream } from 'kefir';
 import { MiddlewareFn } from 'mgfx/dist/connector';
-import { makeInstrumenter, Event } from 'mgfx/dist/middleware/instrumenter';
+import { makeInstrumenter, Event, HeartbeatConfig } from 'mgfx/dist/middleware/instrumenter';
 import { fluent } from 'mgfx/dist/utils/fluenture';
 import { fork } from 'mgfx';
 import {
   FutureInstance,
-  cache,
   chain,
   fork as _fork,
   parallel,
@@ -24,6 +23,7 @@ export type Config = {
     time: number;
     count: number;
   }>;
+  heartbeat?: HeartbeatConfig;
 };
 
 export type Receiver = {
@@ -41,8 +41,16 @@ export type Analyzer = {
 
 const all = parallel(Infinity);
 
+const DEFAULT_HEARTBEAT_CONFIG: HeartbeatConfig = {
+  interval: 60_000
+};
+
 export const makeAnalyzer = (config: Config): Analyzer => {
   const storage = fluent(config.storage).cache();
+  const heartbeat = {
+    ...DEFAULT_HEARTBEAT_CONFIG,
+    ...config.heartbeat
+  };
 
   const emitters = new Map<
     Stream<any, any>,
@@ -76,33 +84,44 @@ export const makeAnalyzer = (config: Config): Analyzer => {
   const self: Analyzer = {
     receiver,
 
-    collector: makeInstrumenter({ receiver }),
+    collector: makeInstrumenter({ receiver, heartbeat }),
 
     query: {
-      spans: (query) => ({
-        get: () => storage.pipe(chain((storage) => storage.query.spans(query))),
+      spans: (query) => {
+        if (heartbeat.interval) {
+          query = {
+            heartbeat: {
+              livenessThreshold: heartbeat.interval * 1.5
+            },
+            ...query
+          };
+        }
 
-        watch: () => {
-          const stream = _stream<Span[], any>((emitter) => {
-            const cancel = self.query
-              .spans(query)
-              .get()
-              .pipe(
-                _fork(emitter.error)((spans) => {
-                  emitter.emit(spans);
-                  emitters.set(stream, [query, emitter]);
-                })
-              );
+        return ({
+          get: () => storage.pipe(chain((storage) => storage.query.spans(query))),
 
-            return () => {
-              cancel();
-              emitters.delete(stream);
-            };
-          });
+          watch: () => {
+            const stream = _stream<Span[], any>((emitter) => {
+              const cancel = self.query
+                .spans(query)
+                .get()
+                .pipe(
+                  _fork(emitter.error)((spans) => {
+                    emitter.emit(spans);
+                    emitters.set(stream, [query, emitter]);
+                  })
+                );
 
-          return stream.skipDuplicates(deepEqual);
-        },
-      }),
+              return () => {
+                cancel();
+                emitters.delete(stream);
+              };
+            });
+
+            return stream.skipDuplicates(deepEqual);
+          },
+      })
+    },
     },
   };
 
