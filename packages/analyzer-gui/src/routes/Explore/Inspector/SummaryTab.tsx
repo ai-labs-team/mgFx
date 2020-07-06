@@ -44,7 +44,22 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
         </>
       );
     }
+
+    if (span.state === 'dead') {
+      return (
+        <>
+          <dt className={Classes.TEXT_MUTED}>Assumed Dead At</dt>
+          <dd>{endedAt}</dd>
+        </>
+      );
+    }
   }, [span, span.state]);
+
+  const lastHeartbeat = React.useMemo(() => {
+    return span.heartbeat?.last
+      ? new Date(span.heartbeat.last).toLocaleString()
+      : 'Never';
+  }, [span.heartbeat?.last]);
 
   const duration = React.useMemo(() => {
     return ('endedAt' in span ? span.endedAt : Date.now()) - span.createdAt;
@@ -82,6 +97,8 @@ export const SummaryTab: React.FC<Props> = ({ span }) => {
           {titleCase(span.state)}
         </Tag>
       </dd>
+      <dt className={Classes.TEXT_MUTED}>Last Heartbeat</dt>
+      <dd>{lastHeartbeat}</dd>
       {finishedAt}
       <dt className={Classes.TEXT_MUTED}>Duration</dt>
       <dd>{duration.toLocaleString()} ms</dd>

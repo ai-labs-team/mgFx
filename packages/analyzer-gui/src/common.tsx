@@ -12,7 +12,8 @@ const STATE_INTENTS: Record<Span['state'], Intent> = {
   running: 'none',
   resolved: 'success',
   rejected: 'danger',
-  cancelled: 'warning'
+  cancelled: 'warning',
+  dead: 'warning'
 };
 
 export const stateIntent = (span: Span): Intent => STATE_INTENTS[span.state];
@@ -36,6 +37,10 @@ export const stateIcon = ({ span, size }: { span: Span; size?: number }) => {
 
   if (span.state === 'cancelled') {
     return 'warning-sign';
+  }
+
+  if (span.state === 'dead') {
+    return 'outdated';
   }
 
   return undefined;
