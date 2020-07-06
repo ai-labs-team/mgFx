@@ -32,6 +32,20 @@ export const IOTab: React.FC<Props> = ({ span }) => {
       );
     }
 
+    if (span.state === 'dead') {
+      const last = span.heartbeat?.last
+        ? new Date(span.heartbeat.last).toLocaleString()
+        : undefined;
+
+      return (
+        <NonIdealState
+          icon="outdated"
+          title="Process is not responding"
+          description={last ? `Last heartbeat received at ${last}` : 'No heartbeat received.'}
+        />
+      );
+    }
+
     return <ObjectInspector data={span.output} theme={theme} />;
   }, [span.state]);
 

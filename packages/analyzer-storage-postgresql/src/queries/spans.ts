@@ -1,4 +1,4 @@
-import pgPromise, { queryResult } from 'pg-promise';
+import pgPromise from 'pg-promise';
 import { SpanParameters } from '@mgfx/analyzer/dist/query';
 import knex from 'knex';
 
@@ -7,8 +7,8 @@ const pgp = pgPromise();
 
 export const buildQuery = (params: SpanParameters) => {
   let query = qb.from('spans');
-  applySelects(query, params);
   applyDistinct(query, params);
+  applySelects(query, params);
   applyWhereInput(query, params);
 
   query.whereNotNull('createdAt');
@@ -50,9 +50,44 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
     'spans.parentId',
     'spans.createdAt',
     'spans.process',
-    params.compact ? qb.raw(`spans.context - 'values' AS context`) : 'spans.context',
-    'spans.state',
-    'spans.endedAt'
+    'spans.heartbeat',
+
+    params.heartbeat
+      ? qb.raw(`
+CASE
+  WHEN spans.state = 'running'
+    AND COALESCE(
+      (spans.heartbeat -> 'last')::bigint,
+      spans."createdAt"
+    ) <= (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000)::bigint - :livenessThreshold
+  THEN COALESCE(
+      (spans.heartbeat -> 'last')::bigint,
+      spans."createdAt"
+  ) + :livenessThreshold
+  ELSE spans."endedAt"
+END AS "endedAt"`,
+          params.heartbeat,
+        )
+      : 'spans.endedAt',
+
+    params.compact
+      ? qb.raw(`spans.context - 'values' AS context`)
+      : 'spans.context',
+
+    params.heartbeat
+      ? qb.raw(`
+CASE
+  WHEN spans.state = 'running'
+    AND COALESCE(
+      (spans.heartbeat -> 'last')::bigint,
+      spans."createdAt"
+    ) <= (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000)::bigint - :livenessThreshold
+  THEN 'dead'
+  ELSE spans.state
+END AS state`,
+          params.heartbeat
+        )
+      : 'spans.state'
   );
 
   if (params.compact !== true) {

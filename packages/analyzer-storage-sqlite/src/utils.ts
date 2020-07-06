@@ -4,6 +4,7 @@ import {
   RejectionEvent,
   ResolutionEvent,
   CancellationEvent,
+  HeartbeatEvent,
 } from 'mgfx/dist/middleware/instrumenter';
 import { value, error } from '@mgfx/codecs';
 import { FutureInstance, parallel, resolve } from 'fluture';
@@ -15,6 +16,7 @@ export const switchEvent = <T, D>(fns: {
   rejection: (event: RejectionEvent, data?: D) => T;
   resolution: (event: ResolutionEvent, data?: D) => T;
   cancellation: (event: CancellationEvent, data?: D) => T;
+  heartbeat: (event: HeartbeatEvent, data?: D) => T;
 }) => (event: Event, data?: D): T => {
   if (event.kind === 'process') {
     return fns.process(event, data);
@@ -32,6 +34,10 @@ export const switchEvent = <T, D>(fns: {
     return fns.cancellation(event, data);
   }
 
+  if (event.kind === 'heartbeat') {
+    return fns.heartbeat(event, data);
+  }
+
   throw new Error('Invalid event kind');
 };
 
@@ -47,4 +53,6 @@ export const encodeEvent = switchEvent<FutureInstance<any, any>, never>({
   resolution: (event) => value.encode(event.value),
 
   cancellation: () => resolve(undefined),
+
+  heartbeat: () => resolve(undefined),
 });

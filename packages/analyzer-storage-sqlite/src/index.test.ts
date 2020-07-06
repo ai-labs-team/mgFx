@@ -6,6 +6,7 @@ import { localConnector, define, implement } from 'mgfx';
 import { join } from 'path';
 import { unlink as _unlink } from 'fs';
 import { promisify } from 'util';
+import { uuid } from 'uuidv4';
 
 import { sqlite } from './index';
 
@@ -73,7 +74,11 @@ const prepareSuite = (name: string) => {
 
   const tryCleanup = async () => {
     try {
-      await unlink(filename);
+      await Promise.all([
+        unlink(filename),
+        unlink(`${filename}-shm`),
+        unlink(`${filename}-wal`),
+      ]);
     } catch (err) {
       if (err.code !== 'ENOENT') {
         throw err;
@@ -334,6 +339,47 @@ describe('query.spans', () => {
       expect(spans[1].input).toEqual([1, 0]);
       expect(spans[1].state).toBe('rejected');
     });
+  });
+
+  it('uses liveness threshold to determine dead spans', async () => {
+    const id = uuid();
+    const timestamp = Date.now() - (5 * 60_000);
+
+    analyzer.receiver({
+      timestamp,
+      kind: 'process',
+      process: {
+        id,
+        input: undefined,
+        spec: {
+          name: 'fake-test',
+        },
+      },
+    });
+
+    analyzer.receiver({
+      timestamp: timestamp + 60_000,
+      kind: 'heartbeat',
+      id
+    })
+
+    await after(100)(undefined).pipe(promise);
+
+    const resultA = await analyzer.query
+      .spans({ scope: { id } })
+      .get()
+      .pipe(promise);
+
+    expect(resultA[0].state).toBe('dead');
+    expect((resultA[0] as any).heartbeat).toEqual({ last: timestamp + 60_000 });
+    expect((resultA[0] as any).endedAt).toEqual(timestamp + 150_000);
+
+    const resultB = await analyzer.query
+      .spans({ scope: { id }, heartbeat: { livenessThreshold: 10 * 60_000 } })
+      .get()
+      .pipe(promise);
+
+    expect(resultB[0].state).toBe('running');
   });
 });
 

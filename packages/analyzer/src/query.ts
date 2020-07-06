@@ -5,6 +5,7 @@
 import { Observable } from 'kefir';
 import { FutureInstance } from 'fluture';
 import { Values } from 'mgfx/dist/context';
+import { HeartbeatConfig } from 'mgfx/dist/middleware/instrumenter';
 
 /**
  * The parameters which may be specified when querying for a list of Spans.
@@ -75,6 +76,19 @@ export type SpanParameters = Partial<{
     | 'output'
     | { input: { path: string[] } }
     | { output: { path: string[] } };
+
+  heartbeat: {
+    /**
+     * If specified, Processes are considered 'dead' if their last heartbeat was more than this number of milliseconds
+     * ago.
+     * 
+     * This should be equal to or greater than the `heartbeat.interval` option passed to `makeAnalyzer` (which defaults
+     * to 60 seconds.)
+     * 
+     * If omitted, defaults to `heartbeat.interval * 1.5`.
+     */
+    livenessThreshold: number;
+  }
 }>;
 
 /**
@@ -95,11 +109,15 @@ export type Span = {
     parentId: string;
     values?: Values;
   };
+  heartbeat?: {
+    last: number;
+  }
 } & (
   | { state: 'running' }
   | { state: 'resolved'; endedAt: number; output?: any }
   | { state: 'rejected'; endedAt: number; output?: any }
   | { state: 'cancelled'; endedAt: number }
+  | { state: 'dead'; endedAt: number }
 );
 
 /**

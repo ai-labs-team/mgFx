@@ -218,7 +218,8 @@ $font-size-small: 10px;
       );
     }
 
-    &.cancelled {
+    &.cancelled,
+    &.dead {
       @include span(
         map-get($pt-intent-text-colors, 'warning'),
         rgba($pt-intent-warning, 0.15),

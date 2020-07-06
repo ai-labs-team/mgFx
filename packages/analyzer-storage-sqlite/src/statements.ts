@@ -81,6 +81,19 @@ INSERT INTO events_cancellation (
 `;
 
 /**
+ * Inserts a row into the `events_heartbeat` table; used to store Events where `event.kind === 'heartbeat'`
+ */
+export const putEventHeartbeat = `
+INSERT INTO events_heartbeat (
+  timestamp,
+  id
+) VALUES (
+  $timestamp,
+  $id
+)
+`;
+
+/**
  * Updates a row in the `spans` table based upon the result of the `computed_spans` view for a specific process ID
  */
 export const updateSpan = `

@@ -4,6 +4,7 @@ import {
   RejectionEvent,
   ResolutionEvent,
   CancellationEvent,
+  HeartbeatEvent
 } from 'mgfx/dist/middleware/instrumenter';
 import { fluent } from 'mgfx/dist/utils/fluenture';
 import { Initializer, Storage } from '@mgfx/analyzer/dist/storage';
@@ -46,6 +47,7 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
   const putEventRejection = db.prepare(statements.putEventRejection);
   const putEventResolution = db.prepare(statements.putEventResolution);
   const putEventCancellation = db.prepare(statements.putEventCancellation);
+  const putEventHeartbeat = db.prepare(statements.putEventHeartbeat);
 
   const cachedValueId = (value: any) => {
     const result = getCachedValue.get(value);
@@ -90,6 +92,15 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
 
     cancellation: db.transaction((event: CancellationEvent) => {
       putEventCancellation.run({
+        timestamp: event.timestamp,
+        id: event.id,
+      });
+
+      updateSpan.run(event.id);
+    }),
+
+    heartbeat: db.transaction((event: HeartbeatEvent) => {
+      putEventHeartbeat.run({
         timestamp: event.timestamp,
         id: event.id,
       });

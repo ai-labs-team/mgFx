@@ -62,6 +62,9 @@ const queryParams = {
           }),
         }),
       ]),
+      heartbeat: t.type({
+        livenessThreshold: t.number
+      }),
       compact: t.boolean,
     })
   ),
@@ -127,8 +130,16 @@ const cancellationEvent = t.intersection([
   }),
 ]);
 
+const heartbeatEvent = t.intersection([
+  baseEvent,
+  t.type({
+    kind: t.literal('heartbeat'),
+    id: t.string
+  })
+])
+
 const event = ioTs(
-  t.union([processEvent, resolutionEvent, rejectionEvent, cancellationEvent])
+  t.union([processEvent, resolutionEvent, rejectionEvent, cancellationEvent, heartbeatEvent])
 );
 
 const decodeQuery = <T>(
