@@ -47,11 +47,13 @@ afterAll(async () => {
 
 describe('/collector', () => {
   it('collects events received via HTTP', async () => {
+    const now = Date.now();
+
     await request(app)
       .post('/analyzer/collector')
       .set('Accept', 'application/json')
       .send({
-        timestamp: 1,
+        timestamp: now,
         kind: 'process',
         process: {
           spec: {
@@ -72,7 +74,7 @@ describe('/collector', () => {
     expect(runningResponse.body).toEqual([
       {
         id: 'test-1',
-        createdAt: 1,
+        createdAt: now,
         process: {
           spec: {
             name: 'test',
@@ -87,7 +89,7 @@ describe('/collector', () => {
       .post('/analyzer/collector')
       .set('Accept', 'application/json')
       .send({
-        timestamp: 2,
+        timestamp: now + 1,
         kind: 'resolution',
         id: 'test-1',
         value: 'world',
@@ -103,8 +105,8 @@ describe('/collector', () => {
     expect(resolvedResponse.body).toEqual([
       {
         id: 'test-1',
-        createdAt: 1,
-        endedAt: 2,
+        createdAt: now,
+        endedAt: now + 1,
         process: {
           spec: {
             name: 'test',
