@@ -6,7 +6,7 @@ import { go, map, parallel } from 'fluture';
 const qb = knex({ client: 'sqlite', useNullAsDefault: true });
 const all = parallel(Infinity);
 
-const STATE_VALUES = ['running', 'resolved', 'rejected', 'cancelled'] as const;
+const STATE_VALUES = ['running', 'resolved', 'rejected', 'cancelled', 'dead'] as const;
 
 export const buildQuery = (params: SpanParameters) =>
   go(function*() {
@@ -66,7 +66,8 @@ const applySelects = (query: knex.QueryBuilder, params: SpanParameters) => {
     'spans.context_id',
     'spans.context_parent_id',
     'spans.state',
-    'spans.ended_at'
+    'spans.ended_at',
+    'spans.last_heartbeat',
   );
 
   if (params.compact !== true) {
@@ -191,6 +192,21 @@ const formatRow = (params: SpanParameters) => (row: any) => {
         if (!params.compact && (row.state === 1 || row.state === 2)) {
           // resolved or rejected
           Object.assign(span, { output });
+        }
+
+        if (params.heartbeat && row.state === 0) {
+          const livenessThreshold =
+            (row.last_heartbeat || row.created_at) +
+            params.heartbeat.livenessThreshold;
+
+          if (livenessThreshold < Date.now()) {
+            // dead
+            Object.assign(span, {
+              state: 'dead',
+              heartbeat: { last: row.last_heartbeat },
+              endedAt: livenessThreshold
+            });
+          }
         }
 
         return span;
