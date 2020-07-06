@@ -18,8 +18,8 @@ const pgp = pgPromise(opts);
 export const postgresql: Initializer<Config> = (config) => {
   /**
    *  Timestamps are persisted with the Postgres type 'bigint'; we make the (rather bold) assumption that the only
-   *  bigint's we'll be dealing as actual column values are timestamps, and therefore OK to parse via `parseInt`. That
-   *  gives us until 2038 to find a better solution.
+   *  bigint's we'll be dealing as actual column values are timestamps, and therefore OK to parse via `parseInt` since
+   *  they'll always be less than `Number.MAX_SAFE_INTEGER`.
    */
   pgp.pg.types.setTypeParser(pgp.pg.types.builtins.INT8, parseInt);
 

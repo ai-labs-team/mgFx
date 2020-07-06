@@ -2,6 +2,7 @@ import { fluent } from 'mgfx/dist/utils/fluenture';
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { ioTs, t } from '@mgfx/validator-iots';
 import { promise, resolve, after, reject } from 'fluture';
+import pgPromise from 'pg-promise';
 import { localConnector, define, implement } from 'mgfx';
 import { uuid } from 'uuidv4';
 
@@ -376,6 +377,47 @@ describe('query.spans', () => {
       expect(spans[0].state).toBe('rejected');
     });
   });
+
+  it('uses liveness threshold to determine dead spans', async () => {
+    const id = uuid();
+    const timestamp = Date.now() - (5 * 60_000);
+
+    analyzer.receiver({
+      timestamp,
+      kind: 'process',
+      process: {
+        id,
+        input: undefined,
+        spec: {
+          name: 'fake-test',
+        },
+      },
+    });
+
+    analyzer.receiver({
+      timestamp: timestamp + 60_000,
+      kind: 'heartbeat',
+      id
+    });
+
+    await after(100)(undefined).pipe(promise);
+
+    const resultA = await analyzer.query
+      .spans({ scope: { id } })
+      .get()
+      .pipe(promise);
+
+    expect(resultA[0].state).toBe('dead');
+    expect(resultA[0].heartbeat).toEqual({ last: timestamp + 60_000 });
+    expect((resultA[0] as any).endedAt).toEqual(timestamp + 150_000);
+
+    const resultB = await analyzer.query
+      .spans({ scope: { id }, heartbeat: { livenessThreshold: 10 * 60_000 } })
+      .get()
+      .pipe(promise);
+
+    expect(resultB[0].state).toBe('running');
+  });
 });
 
 describe('buffered mode', () => {
@@ -421,3 +463,7 @@ describe('buffered mode', () => {
     bufferedAnalyzer.receiver.shutdown();
   });
 });
+
+afterAll(() => {
+  pgPromise().end();
+})
