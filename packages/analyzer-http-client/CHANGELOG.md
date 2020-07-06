@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.3.33 (2020-07-06)
+
+**Note:** Version bump only for package @mgfx/analyzer-http-client
+
+
+
+
+
 ## 0.3.32 (2020-07-01)
 
 **Note:** Version bump only for package @mgfx/analyzer-http-client
