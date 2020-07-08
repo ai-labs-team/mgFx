@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.30 (2020-07-08)
+
+**Note:** Version bump only for package @mgfx/instrumenter-pino
+
+
+
+
+
 ## 0.1.29 (2020-07-06)
 
 **Note:** Version bump only for package @mgfx/instrumenter-pino
