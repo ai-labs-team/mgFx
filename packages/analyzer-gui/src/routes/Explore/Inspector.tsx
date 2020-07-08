@@ -147,7 +147,9 @@ export const Inspector: React.FC = () => {
           <Button minimal small icon="more" />
         </Popover>
       </Tabs>
-      {tabContent}
+      <div className="tab-content">
+        {tabContent}
+      </div>
     </div>
   );
 };

@@ -3,6 +3,8 @@
 
 .inspector {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .options {
     align-self: center;
@@ -27,9 +29,13 @@
     }
   }
 
-  .SplitPane {
-    top: $pt-button-height + 1px !important;
+  .tab-content {
+    flex-grow: 1;
+    // Required to ensure that child SplitPane (which uses absolute positioning) is positioned correctly
+    position: relative;
+  }
 
+  .SplitPane {
     .Pane {
       padding: $pt-grid-size;
       overflow-y: auto;
