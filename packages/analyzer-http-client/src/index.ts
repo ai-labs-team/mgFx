@@ -3,8 +3,9 @@ import { Analyzer, Span } from '@mgfx/analyzer';
 import { value } from '@mgfx/codecs';
 import copy from 'fast-copy';
 import { patch } from 'jsondiffpatch';
-import { map, chain, encaseP, fork } from 'fluture';
+import { map, chain, encaseP, fork, never } from 'fluture';
 import { stream } from 'kefir';
+import { fluent } from 'mgfx/dist/utils/fluenture';
 
 export type Config = {
   baseUrl: string;
@@ -35,6 +36,8 @@ export const httpClient = (config: Config): Analyzer => {
     receiver,
 
     collector: makeInstrumenter({ receiver }),
+
+    retention: never.pipe(fluent),
 
     query: {
       spans: (params) => {

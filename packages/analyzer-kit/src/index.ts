@@ -23,6 +23,15 @@ const config = {
     enabled: process.env.ANALYZER_COLLECTOR_ENABLED !== 'false',
     sizeLimit: process.env.ANALYZER_COLLECTOR_SIZE_LIMIT || '100kb',
   },
+  retention: process.env.ANALYZER_RETENTION_ENABLED !== 'false' ? {
+    maxAge: process.env.ANALYZER_RETENTION_MAX_AGE
+      ? parseInt(process.env.ANALYZER_RETENTION_MAX_AGE)
+      : 10 * 24 * 60 * 60 * 1000,
+
+    checkInterval: process.env.ANALYZER_RETENTION_CHECK_INTERVAL
+      ? parseInt(process.env.ANALYZER_RETENTION_CHECK_INTERVAL)
+      : 60 * 60 * 1000,
+  } : undefined,
 };
 
 const buffer =
@@ -34,15 +43,22 @@ const buffer =
       }
     : undefined;
 
+const analyzer = makeAnalyzer({
+  storage: sqlite({
+    filename: config.storage.filename,
+  }),
+  retention: config.retention,
+  buffer,
+});
+
+if (config.retention) {
+  analyzer.retention.value(() => {});
+}
+
 express()
   .use(
     httpServer({
-      analyzer: makeAnalyzer({
-        storage: sqlite({
-          filename: config.storage.filename,
-        }),
-        buffer,
-      }),
+      analyzer,
       collector: config.collector,
     })
   )
@@ -51,10 +67,16 @@ express()
     console.info(`SQLite Storage location: ${config.storage.filename}`);
     console.info(`Event buffering: ${buffer ? 'enabled' : 'disabled'}`);
     if (buffer) {
-      console.info(`  Buffer size: ${buffer.count} events`);
-      console.info(`  Buffer time: ${buffer.time} ms`);
+      console.info(`  Buffer size: ${buffer.count.toLocaleString()} events`);
+      console.info(`  Buffer time: ${buffer.time.toLocaleString()} ms`);
     }
 
     console.info(`Collector: ${config.collector.enabled}`);
     console.info(`  Size limit: ${config.collector.sizeLimit}`);
+
+    console.info(`Retention: ${config.retention ? 'enabled' : 'disabled'}`);
+    if (config.retention) {
+      console.info(`  Max age:        ${config.retention.maxAge.toLocaleString()} ms`);
+      console.info(`  Check Interval: ${config.retention.checkInterval.toLocaleString()} ms`);
+    }
   });

@@ -102,3 +102,55 @@ REPLACE INTO spans
   FROM computed_spans
   WHERE id = ?
 `;
+
+/**
+ * Expires Spans and Events that are older than the given timestamp, and removes un-referenced cached values.
+ * Exposed as an array so that each statement may be bound individually.
+ *
+ * It is assumed that the first statement here will return a meaningful 'rows affected count' that will be passed back
+ * to the Analyzer denoting the number of spans that have been expired.
+ */
+export const expire = [`
+DELETE
+FROM spans
+WHERE ended_at < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM events_process
+WHERE timestamp < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM events_resolution
+WHERE timestamp < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM events_rejection
+WHERE timestamp < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM events_cancellation
+WHERE timestamp < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM events_heartbeat
+WHERE timestamp < (strftime('%s', 'now') * 1000) - $maxAge;
+`, `
+DELETE
+FROM value_cache
+WHERE rowid IN (
+  SELECT value_cache.rowid
+  FROM value_cache
+  LEFT JOIN events_process
+  ON
+    events_process.input_id = value_cache.rowid OR
+    events_process.context_values_id = value_cache.rowid
+  LEFT JOIN events_rejection
+  ON events_rejection.reason_id = value_cache.rowid
+  LEFT JOIN events_resolution
+  ON events_resolution.value_id = value_cache.rowid
+  WHERE
+    events_process.process_id IS NULL AND
+    events_rejection.id IS NULL AND
+    events_resolution.id IS NULL
+);
+`];

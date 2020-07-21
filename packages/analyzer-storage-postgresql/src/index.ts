@@ -1,3 +1,5 @@
+import { join } from 'path';
+
 import { Initializer, Storage } from '@mgfx/analyzer/dist/storage';
 import { attemptP, encaseP, map } from 'fluture';
 import pgPromise from 'pg-promise';
@@ -25,6 +27,13 @@ export const postgresql: Initializer<Config> = (config) => {
 
   const db = pgp(config.database);
 
+  const retention = new pgp.QueryFile(
+    join(__dirname, 'queries', 'retention.sql'),
+    {
+      minify: true,
+    }
+  );
+
   return migrations.apply(db, config.migrations).pipe(
     map(
       (): Storage => ({
@@ -49,6 +58,11 @@ export const postgresql: Initializer<Config> = (config) => {
             );
           }
         },
+
+        expire: (options) =>
+          attemptP(() => db.result(retention, options)).pipe(
+            map((result) => result.rowCount)
+          ),
       })
     )
   );

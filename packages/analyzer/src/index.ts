@@ -15,6 +15,11 @@ import {
 import { Storage } from './storage';
 import { Interface, Span, SpanParameters } from './query';
 import { makeReceiver } from './receiver';
+import {
+  Config as RetentionConfig,
+  Handler as RetentionHandler,
+  makeHandler as makeRetentionHandler,
+} from './retention';
 
 export type Config = {
   storage: FutureInstance<any, Storage>;
@@ -24,6 +29,7 @@ export type Config = {
     count: number;
   }>;
   heartbeat?: HeartbeatConfig;
+  retention?: RetentionConfig;
 };
 
 export type Receiver = {
@@ -34,6 +40,7 @@ export type Receiver = {
 export type Analyzer = {
   receiver: Receiver;
   collector: MiddlewareFn;
+  retention: RetentionHandler;
   query: {
     spans: Interface<SpanParameters, Span[]>;
   };
@@ -86,6 +93,8 @@ export const makeAnalyzer = (config: Config): Analyzer => {
 
     collector: makeInstrumenter({ receiver, heartbeat }),
 
+    retention: makeRetentionHandler({ storage, config: config.retention }),
+
     query: {
       spans: (query) => {
         if (heartbeat.interval) {
@@ -120,8 +129,8 @@ export const makeAnalyzer = (config: Config): Analyzer => {
 
             return stream.skipDuplicates(deepEqual);
           },
-      })
-    },
+        })
+      },
     },
   };
 
