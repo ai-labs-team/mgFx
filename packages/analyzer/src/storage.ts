@@ -1,6 +1,7 @@
 import { FutureInstance } from 'fluture';
 import { Event } from 'mgfx/dist/middleware/instrumenter';
 import { SpanParameters, Span } from './query';
+import { Expire } from './retention';
 
 /**
  * A Storage provider must be capable of accepting Instrumentation events via `put.event` and storing them in
@@ -17,6 +18,7 @@ export type Storage = {
   query: {
     spans: (params: SpanParameters) => FutureInstance<any, Span[]>;
   };
+  expire?: Expire;
 };
 
 export type Initializer<Config> = (

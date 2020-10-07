@@ -1,9 +1,9 @@
 import { fluent } from 'mgfx/dist/utils/fluenture';
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { ioTs, t } from '@mgfx/validator-iots';
-import { promise, resolve, after, reject } from 'fluture';
+import { Cancel, promise, resolve, after, reject } from 'fluture';
 import pgPromise from 'pg-promise';
-import { localConnector, define, implement } from 'mgfx';
+import { localConnector, define, fork, implement } from 'mgfx';
 import { uuid } from 'uuidv4';
 
 import { postgresql } from './index';
@@ -67,13 +67,19 @@ const couldFail = implement(
 
 const connector = localConnector();
 const storage = postgresql({
-    database: process.env.POSTGRES_URL || 'postgres://postgres:password@localhost/mgfx',
-    migrations: {
-      force: true
-    },
+  database: process.env.POSTGRES_URL || 'postgres://postgres:password@localhost/mgfx',
+  migrations: {
+    force: true
+  },
 });
 
-const analyzer = makeAnalyzer({ storage });
+const analyzer = makeAnalyzer({
+  storage,
+  retention: {
+    maxAge: 10_000,
+    checkInterval: 100
+  }
+});
 
 connector.serveModule({ add, sum, div, avg, couldFail });
 connector.use(analyzer.collector);
@@ -81,13 +87,21 @@ connector.use(analyzer.collector);
 const ctx = connector.createContext({ isTest: true });
 
 describe('query.spans', () => {
+  let stopRetention: Cancel;
+
   beforeAll(async () => {
+    stopRetention = analyzer.retention.pipe(fork.toConsole);
+
     await ctx
       .run(avg([1, 2, 3]))
       .chain(after(100))
       .and(ctx.run(div([1, 0])).alt(resolve(undefined)))
       .chain(after(1000))
       .promise();
+  });
+
+  afterAll(() => {
+    stopRetention();
   });
 
   it('selects all spans', async () => {
@@ -417,6 +431,38 @@ describe('query.spans', () => {
       .pipe(promise);
 
     expect(resultB[0].state).toBe('running');
+  });
+
+  it('removes spans older than retention max age', async () => {
+    const now = Date.now();
+    const id = uuid();
+
+    analyzer.receiver({
+      kind: 'process',
+      timestamp: now - 10_000,
+      process: {
+        id,
+        spec: {
+          name: 'test'
+        },
+        input: undefined
+      }
+    });
+
+    analyzer.receiver({
+      kind: 'resolution',
+      timestamp: now - 9_500,
+      value: undefined,
+      id,
+    });
+
+    await after(100)(undefined).pipe(promise);
+    const a = await analyzer.query.spans({}).get().pipe(promise);
+    expect(a.find(span => span.id === id)).toBeDefined();
+
+    await after(1000)(undefined).pipe(promise);
+    const b = await analyzer.query.spans({}).get().pipe(promise);
+    expect(b.find(span => span.id === id)).toBeUndefined();
   });
 });
 

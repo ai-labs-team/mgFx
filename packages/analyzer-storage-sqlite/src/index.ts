@@ -16,6 +16,7 @@ import { Database } from 'better-sqlite3';
 import * as statements from './statements';
 import * as spans from './queries/spans';
 import { all, switchEvent, encodeEvent } from './utils';
+import { Expire } from '@mgfx/analyzer/dist/retention';
 
 export type Config = {
   filename: string;
@@ -48,6 +49,7 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
   const putEventResolution = db.prepare(statements.putEventResolution);
   const putEventCancellation = db.prepare(statements.putEventCancellation);
   const putEventHeartbeat = db.prepare(statements.putEventHeartbeat);
+  const expire = statements.expire.map(query => db.prepare(query));
 
   const cachedValueId = (value: any) => {
     const result = getCachedValue.get(value);
@@ -143,6 +145,12 @@ export const sqlite: Initializer<Partial<Config>> = (config) => {
           })
           .chain(spans.formatResult(params)),
     },
+    expire: db.transaction<Expire>((options) => {
+      const results = expire.map(stmt => stmt.run(options));
+
+      // Assume the the first result contains the number of Spans deleted
+      return resolve(results[0].changes)
+    }),
   };
 
   return resolve(self);
