@@ -32,7 +32,9 @@
   "dependencies": {
     "@mgfx/analyzer": "^1.2.22",
     "@mgfx/analyzer-http-server": "^0.6.27",
+    "@mgfx/analyzer-storage-postgresql": "^2.2.23",
     "@mgfx/analyzer-storage-sqlite": "^2.2.23",
+    "connection-string": "3.4.2",
     "express": "4.17.1"
   }
 }

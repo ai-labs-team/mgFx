@@ -5831,6 +5831,11 @@ connect-pause@^0.1.1:
   resolved "https://registry.yarnpkg.com/connect-pause/-/connect-pause-0.1.1.tgz#b269b2bb82ddb1ac3db5099c0fb582aba99fb37a"
   integrity sha1-smmyu4Ldsaw9tQmcD7WCq6mfs3o=
 
+connection-string@3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/connection-string/-/connection-string-3.4.2.tgz#278e7f3673752e78675e5eb2647816a4b3c64d73"
+  integrity sha512-t6LmVNKVn6ynMHewmTDxP+D+Rxt/Tx86KvUilPPTAYgJlVOMWcOJO01J6pu7qnwfOZru2ynsUETF44bTrggaHg==
+
 console-browserify@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/console-browserify/-/console-browserify-1.2.0.tgz#67063cef57ceb6cf4993a2ab3a55840ae8c49336"

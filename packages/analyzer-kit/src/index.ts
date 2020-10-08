@@ -2,15 +2,19 @@
 
 import { makeAnalyzer } from '@mgfx/analyzer';
 import { sqlite } from '@mgfx/analyzer-storage-sqlite';
+import { postgresql } from '@mgfx/analyzer-storage-postgresql';
 import { httpServer } from '@mgfx/analyzer-http-server';
+import { ConnectionString }  from 'connection-string';
 import { join } from 'path';
 import express from 'express';
 
 const config = {
   storage: {
+    provider: process.env.ANALYZER_STORAGE_PROVIDER || 'sqlite',
     filename:
       process.env.ANALYZER_STORAGE_FILENAME ||
       join(process.cwd(), 'mgfx-analyzer.sqlite'),
+    postgresUrl: process.env.ANALYZER_STORAGE_POSTGRES_URL || 'postgres://localhost/mgfx'
   },
   buffer: {
     time: parseInt(process.env.ANALYZER_BUFFER_TIME || ''),
@@ -43,11 +47,16 @@ const buffer =
       }
     : undefined;
 
+const storage = config.storage.provider === 'postgresql' ?
+  postgresql({
+    database: config.storage.postgresUrl
+  }) : sqlite({
+    filename: config.storage.filename
+  });
+
 const analyzer = makeAnalyzer({
-  storage: sqlite({
-    filename: config.storage.filename,
-  }),
   retention: config.retention,
+  storage,
   buffer,
 });
 
@@ -64,7 +73,17 @@ express()
   )
   .listen(config.http.port, () => {
     console.info(`Analyzer HTTP Server started on port ${config.http.port}`);
-    console.info(`SQLite Storage location: ${config.storage.filename}`);
+    if (config.storage.provider === 'postgresql') {
+      const cs = new ConnectionString(config.storage.postgresUrl);
+      if (cs.password) {
+        cs.password = '***REDACTED***'
+      }
+
+      console.info(`PostgreSQL Connection URL: ${cs.toString()}`);
+    } else {
+      console.info(`SQLite Storage location: ${config.storage.filename}`);
+    }
+
     console.info(`Event buffering: ${buffer ? 'enabled' : 'disabled'}`);
     if (buffer) {
       console.info(`  Buffer size: ${buffer.count.toLocaleString()} events`);
