@@ -35,6 +35,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Configure Node module cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install dependencies
         run: yarn
 
@@ -106,6 +114,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Configure Node module cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn
