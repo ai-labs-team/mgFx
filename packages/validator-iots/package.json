@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/validator-iots",
-  "version": "0.2.26",
+  "version": "0.2.27",
   "description": "Run-time validation for mgFx, powered by io-ts",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -24,7 +24,7 @@
   "dependencies": {
     "fp-ts": "^2.5.0",
     "io-ts": "^2.1.1",
-    "mgfx": "^0.6.20"
+    "mgfx": "^0.6.21"
   },
   "jest": {
     "preset": "ts-jest",
