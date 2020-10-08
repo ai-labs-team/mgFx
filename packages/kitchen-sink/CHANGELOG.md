@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.20 (2020-10-08)
+
+**Note:** Version bump only for package @mgfx/kitchen-sink
+
+
+
+
+
 ## 0.1.19 (2020-10-08)
 
 **Note:** Version bump only for package @mgfx/kitchen-sink
