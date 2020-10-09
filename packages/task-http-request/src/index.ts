@@ -39,10 +39,9 @@ export const httpRequest = implement(
         url,
         method,
         data,
-        headers: {
-          ...headers,
-          'Correlation-Id': correlationId
-        }
+        headers: correlationId
+          ? {...headers, 'Correlation-Id': correlationId}
+          : headers,
       })
         .then((response: any) =>
           resolve(
