@@ -2,7 +2,7 @@
   "name": "@mgfx/kitchen-sink",
   "private": true,
   "description": "The 'kitchen sink' demo of all available mgFx packages",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
   "license": "ISC",
@@ -23,17 +23,17 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "dependencies": {
-    "@mgfx/analyzer": "^1.2.22",
-    "@mgfx/analyzer-http-server": "^0.6.27",
-    "@mgfx/analyzer-storage-sqlite": "^2.2.23",
-    "@mgfx/express-middleware": "^0.1.34",
-    "@mgfx/task-http-request": "^0.3.27",
-    "@mgfx/validator-iots": "^0.2.28",
+    "@mgfx/analyzer": "^1.2.23",
+    "@mgfx/analyzer-http-server": "^0.6.28",
+    "@mgfx/analyzer-storage-sqlite": "^2.2.24",
+    "@mgfx/express-middleware": "^0.1.35",
+    "@mgfx/task-http-request": "^0.3.28",
+    "@mgfx/validator-iots": "^0.2.29",
     "chaos-middleware": "0.1.1",
     "connect-pause": "0.1.0",
     "fluture-retry": "3.0.0",
     "json-server": "0.16.1",
-    "mgfx": "^0.6.22",
+    "mgfx": "^0.6.23",
     "nodemon": "2.0.2"
   },
   "devDependencies": {
