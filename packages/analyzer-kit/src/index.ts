@@ -99,3 +99,8 @@ express()
       console.info(`  Check Interval: ${config.retention.checkInterval.toLocaleString()} ms`);
     }
   });
+
+process.on('SIGINT', () => {
+  console.info('Received SIGINT, exiting...');
+  process.exit();
+});
