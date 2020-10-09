@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-kit",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "A ready-to-roll, batteries-included mgFx Analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -30,10 +30,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@mgfx/analyzer": "^1.2.23",
-    "@mgfx/analyzer-http-server": "^0.6.28",
-    "@mgfx/analyzer-storage-postgresql": "^2.3.10",
-    "@mgfx/analyzer-storage-sqlite": "^2.2.24",
+    "@mgfx/analyzer": "^1.2.24",
+    "@mgfx/analyzer-http-server": "^0.6.29",
+    "@mgfx/analyzer-storage-postgresql": "^2.3.11",
+    "@mgfx/analyzer-storage-sqlite": "^2.2.25",
     "connection-string": "3.4.2",
     "express": "4.17.1"
   }

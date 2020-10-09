@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.2.25 (2020-10-09)
+
+**Note:** Version bump only for package @mgfx/analyzer-storage-sqlite
+
+
+
+
+
 ## 2.2.24 (2020-10-09)
 
 **Note:** Version bump only for package @mgfx/analyzer-storage-sqlite
