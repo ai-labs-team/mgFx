@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-storage-postgresql",
-  "version": "2.3.11",
+  "version": "2.3.12",
   "description": "postgresql-based storage for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
@@ -22,12 +22,12 @@
     "url": "https://github.com/ai-labs-team/mgFx/issues"
   },
   "devDependencies": {
-    "@mgfx/analyzer": "^1.2.24"
+    "@mgfx/analyzer": "^1.2.25"
   },
   "dependencies": {
-    "@mgfx/codecs": "^0.2.23",
+    "@mgfx/codecs": "^0.2.24",
     "knex": "^0.21.1",
-    "mgfx": "^0.6.24",
+    "mgfx": "^0.6.25",
     "node-pg-migrate": "^5.1.1",
     "pg-monitor": "^1.4.0",
     "pg-promise": "^10.5.7",
