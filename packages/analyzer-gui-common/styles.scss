@@ -1,0 +1,11 @@
+@import '~@blueprintjs/core/src/common/variables';
+
+*:focus {
+  outline: none;
+}
+
+.#{$ns}-radio {
+  .#{$ns}-control-indicator {
+    outline: none !important;
+  }
+}

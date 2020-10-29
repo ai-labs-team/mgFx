@@ -1,0 +1,6 @@
+@import '~@blueprintjs/core/src/common/variables';
+
+.routes {
+    height: calc(100vh - #{$pt-navbar-height});
+    position: relative;
+}

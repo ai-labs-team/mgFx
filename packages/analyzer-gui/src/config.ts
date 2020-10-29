@@ -1,42 +1,44 @@
 import Store from 'electron-store';
-import { SpanParameters } from '@mgfx/analyzer';
+
+import {
+  Config,
+  GetConfig,
+  GetKey,
+  SetConfig,
+  SetKey,
+  WatchConfig,
+  WatchKey,
+  defaults,
+} from '@mgfx/analyzer-gui-common/config';
 
 export type Server = {
   baseUrl: string;
   deltas?: boolean;
 };
 
-export type Schema = {
-  inspectorPosition: 'side' | 'bottom';
-  logDisplayMode: 'list' | 'tree';
-  logParameters: SpanParameters;
-  theme: 'light' | 'dark';
-  servers: Server[];
-};
+declare module '@mgfx/analyzer-gui-common/config' {
+  interface Config {
+    servers?: Server[];
+  }
+}
 
-export const config = new Store<Schema>({
+const store = new Store<Config>({
   schema: {
     logDisplayMode: {
       enum: ['list', 'tree'],
-      default: 'list',
+      default: defaults.logDisplayMode,
     },
     logParameters: {
       type: 'object',
-      default: {
-        limit: 100,
-        order: {
-          field: 'createdAt',
-          direction: 'desc',
-        },
-      } as SpanParameters,
+      default: defaults.logParameters,
     },
     inspectorPosition: {
       enum: ['side', 'bottom'],
-      default: 'bottom',
+      default: defaults.inspectorPosition,
     },
     theme: {
       enum: ['light', 'dark'],
-      default: 'dark',
+      default: defaults.theme,
     },
     servers: {
       type: 'array',
@@ -45,16 +47,28 @@ export const config = new Store<Schema>({
         properties: {
           deltas: {
             type: 'boolean',
-            default: true
+            default: true,
           },
           baseUrl: {
             type: 'string',
             format: 'uri',
           },
         },
-        required: ['baseUrl']
+        required: ['baseUrl'],
       },
       default: [],
     },
   },
 });
+
+export const getConfig: GetConfig = () => store.store;
+
+export const getKey: GetKey = store.get.bind(store);
+
+export const setConfig: SetConfig = store.set.bind(store);
+
+export const setKey: SetKey = store.set.bind(store);
+
+export const watchConfig: WatchConfig = store.onDidAnyChange.bind(store);
+
+export const watchKey: WatchKey = store.onDidChange.bind(store);
