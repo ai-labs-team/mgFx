@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/ai-labs-team/mgFx/compare/mgfx-analyzer-gui@1.3.24...mgfx-analyzer-gui@1.4.0) (2020-10-29)
+
+
+### Features
+
+* **analyzer-kit:** add embedded UI ([c7b306c](https://github.com/ai-labs-team/mgFx/commit/c7b306c))
+
+
+
+
+
 ## 1.3.24 (2020-10-09)
 
 **Note:** Version bump only for package mgfx-analyzer-gui

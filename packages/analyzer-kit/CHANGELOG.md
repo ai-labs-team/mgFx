@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-kit@0.1.25...@mgfx/analyzer-kit@0.2.0) (2020-10-29)
+
+
+### Features
+
+* **analyzer-kit:** add embedded UI ([c7b306c](https://github.com/ai-labs-team/mgFx/commit/c7b306c))
+
+
+
+
+
 ## 0.1.25 (2020-10-09)
 
 **Note:** Version bump only for package @mgfx/analyzer-kit
