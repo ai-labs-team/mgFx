@@ -29,6 +29,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          # Lerna requires full Git history to accurately bump package versions when publishing; setting fetch-depth to 0 ensures all commits and tags are fetched.
+          fetch-depth: 0
 
       - name: Setup Node v${{ matrix.node-version }}
         uses: actions/setup-node@v1
