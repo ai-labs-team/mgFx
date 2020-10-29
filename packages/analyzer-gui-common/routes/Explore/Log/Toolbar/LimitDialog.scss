@@ -1,0 +1,11 @@
+@import '~@blueprintjs/core/src/common/variables';
+
+.limit-dialog {
+  .#{$ns}-callout {
+    margin-bottom: $pt-grid-size;
+  }
+
+  .#{$ns}-form-group {
+    margin-bottom: $pt-grid-size;
+  }
+}

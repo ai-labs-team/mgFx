@@ -1,0 +1,21 @@
+@import '~@blueprintjs/core/src/common/variables';
+
+.status-bar {
+  background-color: $light-gray5 !important;
+  border-radius: unset !important;
+  padding: $pt-grid-size / 2 !important;
+  padding-left: 32px !important;
+
+  .bp3-dark & {
+    background-color: $dark-gray5 !important;
+    box-shadow: $pt-dark-elevation-shadow-1;
+  }
+
+  .bp3-icon {
+    top: ($pt-grid-size - 1) !important;
+  }
+
+  .timestamp {
+    float: right;
+  }
+}
