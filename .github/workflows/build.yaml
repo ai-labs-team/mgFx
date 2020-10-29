@@ -196,6 +196,10 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
 
+      # https://github.com/yarnpkg/yarn/issues/8242#issuecomment-661881292
+      - name: Extend yarn network timeout
+        run: yarn config set network-timeout 30000
+
       - name: Install dependencies
         run: yarn
 
