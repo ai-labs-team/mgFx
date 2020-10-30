@@ -16,6 +16,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.json",
+    "fb": "yarn clean && yarn build && rsync -avhiP --delete /home/ailabs/projects/ailabs/mgFx/packages/task-http-request/dist/ /home/ailabs/projects/ailabs/axiom-integrations/node_modules/@mgfx/task-http-request/dist/",
     "test": "jest"
   },
   "bugs": {
@@ -25,6 +26,7 @@
     "@mgfx/validator-iots": "^0.2.31",
     "axios": "^0.19.2",
     "bull": "^3.13.0",
+    "https-proxy-agent": "^5.0.0",
     "mgfx": "^0.6.25",
     "ts-custom-error": "^3.1.1"
   },
