@@ -1,8 +1,14 @@
-import { define, implement } from 'mgfx';
 import { ioTs, t } from '@mgfx/validator-iots';
 import axios, { AxiosError } from 'axios';
 import { Future } from 'fluture';
+import HttpsProxyAgent from 'https-proxy-agent/dist/agent';
+import { define, implement } from 'mgfx';
 import { HttpRequestError } from './error';
+
+const axiosInstance =
+  (process.env.HTTP_PROXY && process.env.HTTPS_PROXY_USE_HTTP)
+    ? axios.create({ httpsAgent: new HttpsProxyAgent(process.env.HTTP_PROXY) })
+    : axios;
 
 export const httpRequest = implement(
   define({
@@ -35,7 +41,7 @@ export const httpRequest = implement(
     Future((reject, resolve) => {
       const source = axios.CancelToken.source();
 
-      axios({
+      axiosInstance({
         url,
         method,
         data,
