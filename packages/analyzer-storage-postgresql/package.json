@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-storage-postgresql",
-  "version": "2.3.12",
+  "version": "2.3.13",
   "description": "postgresql-based storage for @mgfx/analyzer",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",

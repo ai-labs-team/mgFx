@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.13](https://github.com/ai-labs-team/mgFx/compare/@mgfx/analyzer-storage-postgresql@2.3.12...@mgfx/analyzer-storage-postgresql@2.3.13) (2020-11-06)
+
+
+### Bug Fixes
+
+* **analyzer-storage-postgresql:** copy queries to dist during build ([3a3fe48](https://github.com/ai-labs-team/mgFx/commit/3a3fe48))
+
+
+
+
+
 ## 2.3.12 (2020-10-09)
 
 **Note:** Version bump only for package @mgfx/analyzer-storage-postgresql
