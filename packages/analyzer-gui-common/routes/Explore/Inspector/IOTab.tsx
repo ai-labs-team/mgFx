@@ -47,7 +47,7 @@ export const IOTab: React.FC<Props> = ({ span }) => {
       );
     }
 
-    return <ObjectInspector data={span.output} theme={inspectorTheme} />;
+    return <ObjectInspector data={span.output} theme={inspectorTheme} expandLevel={1} />;
   }, [span.state]);
 
   return (
@@ -56,7 +56,7 @@ export const IOTab: React.FC<Props> = ({ span }) => {
       split={inspectorPosition === 'side' ? 'horizontal' : 'vertical'}
       defaultSize="50%"
     >
-      <ObjectInspector data={span.input} theme={inspectorTheme} />
+      <ObjectInspector data={span.input} theme={inspectorTheme} expandLevel={1} />
       {output}
     </SplitPane>
   );
