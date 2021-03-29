@@ -1,6 +1,6 @@
 {
   "name": "@mgfx/analyzer-gui-common",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Common Analyzer GUI components",
   "author": "Warren Seymour <warren@fountainhead.tech>",
   "homepage": "https://github.com/ai-labs-team/mgFx#readme",
