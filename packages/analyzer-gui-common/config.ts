@@ -26,7 +26,7 @@ export type WatchKey = <K extends Key>(
 ) => () => void;
 
 export const defaults: Config = {
-  logDisplayMode: 'list',
+  logDisplayMode: 'tree',
   logParameters: {
     limit: 100,
     order: {
